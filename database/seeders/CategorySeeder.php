@@ -62,6 +62,54 @@ class CategorySeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'name' => 'Mess & Food',
+                'description' => 'Cafeteria, hostel mess, and food service issues',
+                'icon' => 'fa-utensils',
+                'color' => '#d35400',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Carpentry & Furniture',
+                'description' => 'Furniture repairs, doors, windows, and desks',
+                'icon' => 'fa-couch',
+                'color' => '#8e44ad',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Academic Facilities',
+                'description' => 'Classroom equipment, library issues, and seminar rooms',
+                'icon' => 'fa-graduation-cap',
+                'color' => '#27ae60',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'IT & Lab Equipment',
+                'description' => 'Computer labs, projectors, software, and hardware',
+                'icon' => 'fa-desktop',
+                'color' => '#2c3e50',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Medical & Health',
+                'description' => 'First aid, clinic services, and emergency medical requests',
+                'icon' => 'fa-briefcase-medical',
+                'color' => '#c0392b',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Transportation & Parking',
+                'description' => 'Shuttles, parking permits, and vehicle issues',
+                'icon' => 'fa-car-side',
+                'color' => '#16a085',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
                 'name' => 'Other',
                 'description' => 'Other complaints',
                 'icon' => 'fa-ellipsis-h',
@@ -71,6 +119,17 @@ class CategorySeeder extends Seeder
             ],
         ];
 
-        DB::table('categories')->insert($categories);
+        foreach ($categories as $cat) {
+            DB::table('categories')->updateOrInsert(
+                ['name' => $cat['name']],
+                [
+                    'description' => $cat['description'],
+                    'icon' => $cat['icon'],
+                    'color' => $cat['color'],
+                    'created_at' => $cat['created_at'],
+                    'updated_at' => $cat['updated_at'],
+                ]
+            );
+        }
     }
 }
