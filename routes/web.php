@@ -49,6 +49,7 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/complaints/{id}', [ComplaintController::class, 'getComplaintDetail']);
         Route::get('/complaints/{id}/updates', [ComplaintController::class, 'getUpdates']);
         Route::get('/stats', [ComplaintController::class, 'getStats']);
+        Route::post('/complaints/{id}/rate', [ComplaintController::class, 'rate']);
         
         // Profile AJAX
         Route::get('/profile', [ProfileController::class, 'getProfile']);
@@ -106,6 +107,7 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/analytics/categories', [AnalyticsController::class, 'getCategoryStats']);
         Route::get('/analytics/resolution', [AnalyticsController::class, 'getResolutionStats']);
         Route::get('/analytics/distribution', [AnalyticsController::class, 'getDistribution']);
+        Route::get('/analytics/satisfaction', [AnalyticsController::class, 'getSatisfactionStats']);
         Route::get('/analytics/export', [AnalyticsController::class, 'export']);
 
         // Settings

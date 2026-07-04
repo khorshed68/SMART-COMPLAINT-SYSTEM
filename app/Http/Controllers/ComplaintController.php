@@ -6,6 +6,7 @@ use App\Http\Requests\StoreComplaintRequest;
 use App\Models\Complaint;
 use App\Models\Category;
 use App\Services\ComplaintService;
+use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -188,5 +189,56 @@ class ComplaintController extends Controller
     public function getCategories()
     {
         return response()->json(Category::all());
+    }
+
+    /**
+     * AJAX: Submit user satisfaction rating and feedback.
+     */
+    public function rate(Request $request, int $id)
+    {
+        $complaint = Complaint::findOrFail($id);
+
+        // Security check: Submitter/Owner only
+        if ($complaint->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Must be resolved
+        if ($complaint->status !== 'Resolved') {
+            return response()->json(['message' => 'You can only rate resolved complaints.'], 400);
+        }
+
+        // Cannot rate twice
+        if ($complaint->rating !== null) {
+            return response()->json(['message' => 'This complaint has already been rated.'], 400);
+        }
+
+        // Validate rating values
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'feedback' => 'nullable|string|max:1000',
+        ]);
+
+        // Save review
+        $complaint->update([
+            'rating' => (int) $request->rating,
+            'feedback' => $request->feedback,
+            'rated_at' => now(),
+        ]);
+
+        // Audit Log
+        AuditService::log(
+            'complaint_rated',
+            $complaint->id,
+            ['rating' => $complaint->rating, 'feedback' => $complaint->feedback],
+            null
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Thank you for your feedback!',
+            'rating' => $complaint->rating,
+            'feedback' => $complaint->feedback
+        ]);
     }
 }

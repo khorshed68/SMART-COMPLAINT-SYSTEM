@@ -30,10 +30,22 @@ class AnalyticsService
         $totalCategories = Category::count();
 
         // Calculate average resolution days
-        $avgResolutionDays = Complaint::status('Resolved')
-            ->whereNotNull('resolved_at')
-            ->selectRaw("AVG(TIMESTAMPDIFF(DAY, created_at, resolved_at)) as avg_days")
-            ->value('avg_days') ?? 0;
+        $driver = DB::connection()->getDriverName();
+        if ($driver === 'sqlite') {
+            $avgResolutionDays = Complaint::status('Resolved')
+                ->whereNotNull('resolved_at')
+                ->selectRaw("AVG(julianday(resolved_at) - julianday(created_at)) as avg_days")
+                ->value('avg_days') ?? 0;
+        } else {
+            $avgResolutionDays = Complaint::status('Resolved')
+                ->whereNotNull('resolved_at')
+                ->selectRaw("AVG(TIMESTAMPDIFF(DAY, created_at, resolved_at)) as avg_days")
+                ->value('avg_days') ?? 0;
+        }
+
+        $avgSatisfaction = Complaint::whereNotNull('rating')
+            ->avg('rating') ?? 0;
+        $totalRated = Complaint::whereNotNull('rating')->count();
 
         $complaintsToday = Complaint::whereDate('created_at', Carbon::today())->count();
         $complaintsThisWeek = Complaint::where('created_at', '>=', Carbon::now()->startOfWeek())->count();
@@ -49,6 +61,8 @@ class AnalyticsService
             'total_admins' => $totalAdmins,
             'total_categories' => $totalCategories,
             'avg_resolution_days' => round($avgResolutionDays, 1),
+            'avg_satisfaction' => round($avgSatisfaction, 1),
+            'total_rated' => $totalRated,
             'complaints_today' => $complaintsToday,
             'complaints_this_week' => $complaintsThisWeek,
             'complaints_this_month' => $complaintsThisMonth,
@@ -180,14 +194,26 @@ class AnalyticsService
      */
     public function getResolutionTimeStats(): array
     {
-        $stats = Complaint::status('Resolved')
-            ->whereNotNull('resolved_at')
-            ->selectRaw("
-                AVG(TIMESTAMPDIFF(HOUR, created_at, resolved_at)) as avg_hours,
-                MIN(TIMESTAMPDIFF(HOUR, created_at, resolved_at)) as min_hours,
-                MAX(TIMESTAMPDIFF(HOUR, created_at, resolved_at)) as max_hours
-            ")
-            ->first();
+        $driver = DB::connection()->getDriverName();
+        if ($driver === 'sqlite') {
+            $stats = Complaint::status('Resolved')
+                ->whereNotNull('resolved_at')
+                ->selectRaw("
+                    AVG((julianday(resolved_at) - julianday(created_at)) * 24) as avg_hours,
+                    MIN((julianday(resolved_at) - julianday(created_at)) * 24) as min_hours,
+                    MAX((julianday(resolved_at) - julianday(created_at)) * 24) as max_hours
+                ")
+                ->first();
+        } else {
+            $stats = Complaint::status('Resolved')
+                ->whereNotNull('resolved_at')
+                ->selectRaw("
+                    AVG(TIMESTAMPDIFF(HOUR, created_at, resolved_at)) as avg_hours,
+                    MIN(TIMESTAMPDIFF(HOUR, created_at, resolved_at)) as min_hours,
+                    MAX(TIMESTAMPDIFF(HOUR, created_at, resolved_at)) as max_hours
+                ")
+                ->first();
+        }
 
         return [
             'avg_hours' => round($stats->avg_hours ?? 0, 1),
@@ -201,12 +227,19 @@ class AnalyticsService
      */
     public function getAssigneePerformance(): array
     {
+        $driver = DB::connection()->getDriverName();
+        $avgHoursExpr = $driver === 'sqlite'
+            ? "AVG(CASE WHEN complaints.status = 'Resolved' THEN (julianday(complaints.resolved_at) - julianday(complaints.created_at)) * 24 ELSE NULL END) as avg_res_hours"
+            : "AVG(CASE WHEN complaints.status = 'Resolved' THEN TIMESTAMPDIFF(HOUR, complaints.created_at, complaints.resolved_at) ELSE NULL END) as avg_res_hours";
+
         return User::admins()
             ->leftJoin('complaints', 'users.id', '=', 'complaints.assigned_to')
             ->select('users.name')
             ->selectRaw('COUNT(complaints.id) as assigned_count')
             ->selectRaw("SUM(CASE WHEN complaints.status = 'Resolved' THEN 1 ELSE 0 END) as resolved_count")
-            ->selectRaw("AVG(CASE WHEN complaints.status = 'Resolved' THEN TIMESTAMPDIFF(HOUR, complaints.created_at, complaints.resolved_at) ELSE NULL END) as avg_res_hours")
+            ->selectRaw($avgHoursExpr)
+            ->selectRaw('AVG(complaints.rating) as avg_rating')
+            ->selectRaw('COUNT(complaints.rating) as rated_count')
             ->groupBy('users.id', 'users.name')
             ->get()
             ->map(function ($item) {
@@ -217,6 +250,8 @@ class AnalyticsService
                     'resolved' => (int) $item->resolved_count,
                     'avg_hours' => round($item->avg_res_hours ?? 0, 1),
                     'rate' => round($rate, 1),
+                    'avg_rating' => $item->avg_rating !== null ? round($item->avg_rating, 1) : null,
+                    'rated_count' => (int) $item->rated_count,
                 ];
             })
             ->toArray();
@@ -228,14 +263,16 @@ class AnalyticsService
     public function getHourlyDistribution(): array
     {
         $hours = array_fill(0, 24, 0);
+        $driver = DB::connection()->getDriverName();
+        $hourExpr = $driver === 'sqlite' ? "cast(strftime('%H', created_at) as integer) as hour" : "HOUR(created_at) as hour";
 
-        $data = Complaint::selectRaw('HOUR(created_at) as hour, COUNT(*) as count')
+        $data = Complaint::selectRaw("$hourExpr, COUNT(*) as count")
             ->groupBy('hour')
             ->pluck('count', 'hour')
             ->toArray();
 
         foreach ($data as $hour => $count) {
-            $hours[$hour] = (int) $count;
+            $hours[(int) $hour] = (int) $count;
         }
 
         return $hours;
@@ -256,13 +293,21 @@ class AnalyticsService
             7 => 0, // Sun
         ];
 
-        $data = Complaint::selectRaw('WEEKDAY(created_at) as day, COUNT(*) as count')
+        $driver = DB::connection()->getDriverName();
+        $dayExpr = $driver === 'sqlite' ? "cast(strftime('%w', created_at) as integer) as day" : "WEEKDAY(created_at) as day";
+
+        $data = Complaint::selectRaw("$dayExpr, COUNT(*) as count")
             ->groupBy('day')
             ->get();
 
         foreach ($data as $row) {
-            // WEEKDAY returns 0 = Mon, 6 = Sun in MySQL
-            $dayNum = $row->day + 1;
+            // strftime('%w') returns 0 = Sunday, 1 = Monday, 6 = Saturday in SQLite
+            // WEEKDAY returns 0 = Monday, 6 = Sunday in MySQL
+            if ($driver === 'sqlite') {
+                $dayNum = (int)$row->day === 0 ? 7 : (int)$row->day;
+            } else {
+                $dayNum = (int)$row->day + 1;
+            }
             $days[$dayNum] = (int) $row->count;
         }
 
@@ -293,5 +338,76 @@ class AnalyticsService
         }
 
         return $query->orderBy('created_at', 'desc')->get();
+    }
+
+    /**
+     * Get satisfaction rating distribution (1-5 stars count).
+     */
+    public function getSatisfactionDistribution(): array
+    {
+        $distribution = [
+            1 => 0,
+            2 => 0,
+            3 => 0,
+            4 => 0,
+            5 => 0,
+        ];
+
+        $ratings = Complaint::whereNotNull('rating')
+            ->select('rating')
+            ->selectRaw('COUNT(*) as count')
+            ->groupBy('rating')
+            ->pluck('count', 'rating')
+            ->toArray();
+
+        foreach ($ratings as $stars => $count) {
+            $distribution[(int) $stars] = (int) $count;
+        }
+
+        return $distribution;
+    }
+
+    /**
+     * Get average satisfaction rating per category.
+     */
+    public function getCategorySatisfactionDistribution(): array
+    {
+        return Category::leftJoin('complaints', 'categories.id', '=', 'complaints.category_id')
+            ->select('categories.name', 'categories.color')
+            ->selectRaw('AVG(complaints.rating) as avg_rating')
+            ->selectRaw('COUNT(complaints.rating) as rated_count')
+            ->groupBy('categories.id', 'categories.name', 'categories.color')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => $item->name,
+                    'color' => $item->color,
+                    'avg_rating' => $item->avg_rating !== null ? round($item->avg_rating, 1) : null,
+                    'rated_count' => (int) $item->rated_count,
+                ];
+            })
+            ->toArray();
+    }
+
+    /**
+     * Get average satisfaction rating per administrator.
+     */
+    public function getAdminSatisfactionDistribution(): array
+    {
+        return User::admins()
+            ->leftJoin('complaints', 'users.id', '=', 'complaints.assigned_to')
+            ->select('users.name')
+            ->selectRaw('AVG(complaints.rating) as avg_rating')
+            ->selectRaw('COUNT(complaints.rating) as rated_count')
+            ->groupBy('users.id', 'users.name')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => $item->name,
+                    'avg_rating' => $item->avg_rating !== null ? round($item->avg_rating, 1) : null,
+                    'rated_count' => (int) $item->rated_count,
+                ];
+            })
+            ->toArray();
     }
 }

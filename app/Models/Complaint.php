@@ -21,10 +21,15 @@ class Complaint extends Model
         'attachment',
         'location',
         'resolved_at',
+        'rating',
+        'feedback',
+        'rated_at',
     ];
 
     protected $casts = [
         'resolved_at' => 'datetime',
+        'rated_at' => 'datetime',
+        'rating' => 'integer',
     ];
 
     /**
@@ -108,6 +113,22 @@ class Complaint extends Model
     public function scopeByUser(Builder $query, int $userId): Builder
     {
         return $query->where('user_id', $userId);
+    }
+
+    /**
+     * Scope to filter only rated complaints.
+     */
+    public function scopeRated(Builder $query): Builder
+    {
+        return $query->whereNotNull('rating');
+    }
+
+    /**
+     * Scope to filter only unrated but resolved complaints.
+     */
+    public function scopeUnrated(Builder $query): Builder
+    {
+        return $query->where('status', 'Resolved')->whereNull('rating');
     }
 
     /**

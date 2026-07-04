@@ -61,6 +61,71 @@
                     @endif
                 </div>
             </div>
+
+            @if($complaint->status === 'Resolved')
+                <div class="card mb-4 mt-4" id="satisfaction-rating-card">
+                    <div class="card-header font-weight-bold">
+                        <i class="fas fa-smile mr-2 text-warning"></i> Customer Satisfaction Feedback
+                    </div>
+                    <div class="card-body">
+                        @if($complaint->rating === null)
+                            <!-- Rating input form -->
+                            <form id="rating-feedback-form">
+                                <p class="mb-3 text-muted" style="font-size: 0.9rem;">
+                                    This complaint has been resolved. Please take a moment to rate our service and let us know your feedback!
+                                </p>
+                                
+                                <div class="rating-stars-select mb-4 text-center" style="user-select: none;">
+                                    <input type="hidden" name="rating" id="rating-input-value" value="0">
+                                    <span class="star-btn" data-star="1" style="cursor: pointer; margin: 0 5px; color: #cbd5e1; transition: color 0.15s ease;"><i class="far fa-star fa-2x"></i></span>
+                                    <span class="star-btn" data-star="2" style="cursor: pointer; margin: 0 5px; color: #cbd5e1; transition: color 0.15s ease;"><i class="far fa-star fa-2x"></i></span>
+                                    <span class="star-btn" data-star="3" style="cursor: pointer; margin: 0 5px; color: #cbd5e1; transition: color 0.15s ease;"><i class="far fa-star fa-2x"></i></span>
+                                    <span class="star-btn" data-star="4" style="cursor: pointer; margin: 0 5px; color: #cbd5e1; transition: color 0.15s ease;"><i class="far fa-star fa-2x"></i></span>
+                                    <span class="star-btn" data-star="5" style="cursor: pointer; margin: 0 5px; color: #cbd5e1; transition: color 0.15s ease;"><i class="far fa-star fa-2x"></i></span>
+                                    <div class="rating-label-display mt-2 font-weight-bold text-muted" id="rating-label" style="font-size: 0.9rem;">Select a rating</div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="feedback-text" class="form-label font-weight-bold text-muted" style="font-size: 0.85rem;">Feedback & Comments (Optional)</label>
+                                    <textarea name="feedback" id="feedback-text" class="form-control" rows="3" placeholder="Tell us about your experience..." style="border-radius: 8px; font-size: 0.9rem;"></textarea>
+                                </div>
+
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-secondary px-4 py-2" id="submit-feedback-btn" disabled style="border-radius: 8px; font-weight: 600;">
+                                        <i class="fas fa-paper-plane mr-1"></i> Submit Feedback
+                                    </button>
+                                </div>
+                            </form>
+                        @else
+                            <!-- Rating review display -->
+                            <div class="text-center py-2">
+                                <div class="mb-2">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $complaint->rating)
+                                            <i class="fas fa-star text-warning fa-2x"></i>
+                                        @else
+                                            <i class="far fa-star text-warning fa-2x"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+                                <h4 class="font-weight-bold mb-3" style="color: var(--dark);">
+                                    Rating: {{ $complaint->rating }} / 5
+                                </h4>
+                                @if($complaint->feedback)
+                                    <blockquote class="p-3 bg-light border italic" style="border-radius: 8px; font-size: 0.92rem; color: #4a5568; margin: 15px auto; max-width: 600px; border-left: 4px solid var(--primary) !important;">
+                                        "{{ $complaint->feedback }}"
+                                    </blockquote>
+                                @else
+                                    <p class="text-muted italic mb-0" style="font-size: 0.9rem;">No comments provided.</p>
+                                @endif
+                                <div class="text-muted mt-3" style="font-size: 0.75rem;">
+                                    Rated on {{ $complaint->rated_at ? $complaint->rated_at->format('Y-m-d H:i') : '' }}
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Sidebar Panel (Status, Priority, timeline) -->

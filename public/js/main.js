@@ -261,3 +261,152 @@ function loadComplaints(page = 1, filters = {}) {
         });
     });
 }
+
+// Interactive Star Rating Selectors & Form Post handler
+$(document).ready(function() {
+    // Star hover & click interactions
+    const ratingLabels = {
+        0: 'Select a rating',
+        1: 'Poor - Very dissatisfied',
+        2: 'Fair - Unsatisfied',
+        3: 'Good - Neutral/Average',
+        4: 'Very Good - Satisfied',
+        5: 'Excellent - Very satisfied'
+    };
+
+    $(document).on('mouseenter', '.rating-stars-select .star-btn', function() {
+        const starNum = parseInt($(this).data('star'), 10);
+        const parent = $(this).closest('.rating-stars-select');
+        
+        parent.find('.star-btn').each(function() {
+            const currentNum = parseInt($(this).data('star'), 10);
+            const icon = $(this).find('i');
+            if (currentNum <= starNum) {
+                $(this).addClass('hovered');
+                icon.removeClass('far').addClass('fas');
+            } else {
+                $(this).removeClass('hovered');
+                icon.removeClass('fas').addClass('far');
+            }
+        });
+        
+        $('#rating-label').text(ratingLabels[starNum]).removeClass('text-muted').addClass('text-warning');
+    });
+
+    $(document).on('mouseleave', '.rating-stars-select', function() {
+        const parent = $(this);
+        const selectedValue = parseInt($('#rating-input-value').val(), 10);
+        
+        parent.find('.star-btn').each(function() {
+            const currentNum = parseInt($(this).data('star'), 10);
+            const icon = $(this).find('i');
+            $(this).removeClass('hovered');
+            if (currentNum <= selectedValue) {
+                $(this).addClass('selected');
+                icon.removeClass('far').addClass('fas');
+            } else {
+                $(this).removeClass('selected');
+                icon.removeClass('fas').addClass('far');
+            }
+        });
+        
+        if (selectedValue > 0) {
+            $('#rating-label').text(ratingLabels[selectedValue]).removeClass('text-muted').addClass('text-warning');
+        } else {
+            $('#rating-label').text(ratingLabels[0]).removeClass('text-warning').addClass('text-muted');
+        }
+    });
+
+    $(document).on('click', '.rating-stars-select .star-btn', function() {
+        const starNum = parseInt($(this).data('star'), 10);
+        $('#rating-input-value').val(starNum);
+        
+        $(this).closest('.rating-stars-select').find('.star-btn').each(function() {
+            const currentNum = parseInt($(this).data('star'), 10);
+            if (currentNum <= starNum) {
+                $(this).addClass('selected');
+            } else {
+                $(this).removeClass('selected');
+            }
+        });
+        
+        $('#submit-feedback-btn').prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
+    });
+
+    // Rating Form Submit Handler
+    $(document).on('submit', '#rating-feedback-form', function(e) {
+        e.preventDefault();
+        
+        const form = $(this);
+        const submitBtn = $('#submit-feedback-btn');
+        const rating = $('#rating-input-value').val();
+        const feedback = $('#feedback-text').val();
+        
+        // Extract complaint ID from URL
+        const urlParts = window.location.pathname.split('/');
+        const complaintId = urlParts[urlParts.length - 1];
+        
+        if (!complaintId || isNaN(complaintId)) {
+            Toast.show('Error identifying complaint ID.', 'error');
+            return;
+        }
+
+        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Submitting...');
+
+        $.ajax({
+            url: `/api/complaints/${complaintId}/rate`,
+            method: 'POST',
+            data: {
+                rating: rating,
+                feedback: feedback
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    Toast.show(response.message, 'success');
+                    
+                    // Re-render card with static rating display
+                    let starsHtml = '';
+                    for (let i = 1; i <= 5; i++) {
+                        if (i <= response.rating) {
+                            starsHtml += '<i class="fas fa-star text-warning fa-2x"></i>';
+                        } else {
+                            starsHtml += '<i class="far fa-star text-warning fa-2x"></i>';
+                        }
+                    }
+                    
+                    const container = $('#satisfaction-rating-card .card-body');
+                    container.html(`
+                        <div class="text-center py-2 fade-in">
+                            <div class="mb-2">
+                                ${starsHtml}
+                            </div>
+                            <h4 class="font-weight-bold mb-3" style="color: var(--dark);">
+                                Rating: ${response.rating} / 5
+                            </h4>
+                            ${response.feedback ? `
+                                <blockquote class="p-3 bg-light border italic" style="border-radius: 8px; font-size: 0.92rem; color: #4a5568; margin: 15px auto; max-width: 600px; border-left: 4px solid var(--primary) !important; text-align: left;">
+                                    "${response.feedback}"
+                                </blockquote>
+                            ` : '<p class="text-muted italic mb-0" style="font-size: 0.9rem;">No comments provided.</p>'}
+                            <div class="text-muted mt-3" style="font-size: 0.75rem;">
+                                Rated on Just now
+                            </div>
+                        </div>
+                    `);
+                    
+                    // Refresh the timeline
+                    if (typeof loadTimeline === 'function') {
+                        loadTimeline();
+                    }
+                }
+            },
+            error: function(xhr) {
+                submitBtn.prop('disabled', false).html('<i class="fas fa-paper-plane mr-1"></i> Submit Feedback');
+                const response = xhr.responseJSON;
+                const msg = response && response.message ? response.message : 'Error submitting feedback.';
+                Toast.show(msg, 'error');
+            }
+        });
+    });
+});

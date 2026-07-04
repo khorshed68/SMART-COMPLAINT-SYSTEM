@@ -123,6 +123,38 @@
                     <button type="button" class="btn btn-outline-danger w-100 mt-4" onclick="deleteAndRedirect()"><i class="fas fa-trash"></i> Delete Complaint</button>
                 </div>
             </div>
+
+            @if($complaint->rating !== null)
+                <div class="card mb-4 mt-3">
+                    <div class="card-header font-weight-bold">
+                        <i class="fas fa-smile mr-2 text-warning"></i> Customer Feedback Rating
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <= $complaint->rating)
+                                    <i class="fas fa-star text-warning fa-2x"></i>
+                                @else
+                                    <i class="far fa-star text-warning fa-2x"></i>
+                                @endif
+                            @endfor
+                        </div>
+                        <h4 class="font-weight-bold mb-3" style="color: var(--dark);">
+                            Score: {{ $complaint->rating }} / 5
+                        </h4>
+                        @if($complaint->feedback)
+                            <blockquote class="p-3 bg-light border italic" style="border-radius: 8px; font-size: 0.9rem; color: #4a5568; margin: 10px 0; border-left: 4px solid var(--primary) !important; text-align: left;">
+                                "{{ $complaint->feedback }}"
+                            </blockquote>
+                        @else
+                            <p class="text-muted italic mb-0" style="font-size: 0.85rem;">No feedback comments left.</p>
+                        @endif
+                        <div class="text-muted mt-3" style="font-size: 0.72rem;">
+                            Submitted on {{ $complaint->rated_at ? $complaint->rated_at->format('Y-m-d H:i') : '' }}
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </div>

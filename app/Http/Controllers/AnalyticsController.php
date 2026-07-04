@@ -81,6 +81,18 @@ class AnalyticsController extends Controller
     }
 
     /**
+     * AJAX: Get satisfaction stats (ratings, categories, admins).
+     */
+    public function getSatisfactionStats()
+    {
+        return response()->json([
+            'ratings' => $this->analyticsService->getSatisfactionDistribution(),
+            'categories' => $this->analyticsService->getCategorySatisfactionDistribution(),
+            'admins' => $this->analyticsService->getAdminSatisfactionDistribution()
+        ]);
+    }
+
+    /**
      * AJAX/Download: Export filtered complaints.
      */
     public function export(Request $request)
@@ -115,7 +127,8 @@ class AnalyticsController extends Controller
         $columns = [
             'Complaint ID', 'Title', 'Description', 'Category', 'Priority', 
             'Status', 'Submitter Name', 'Submitter Email', 'Department', 
-            'Location', 'Assigned To', 'Created At', 'Resolved At', 'Resolution Notes'
+            'Location', 'Assigned To', 'Created At', 'Resolved At', 'Resolution Notes',
+            'Satisfaction Rating', 'Feedback Comment', 'Rated At'
         ];
 
         $callback = function() use($complaints, $columns) {
@@ -137,7 +150,10 @@ class AnalyticsController extends Controller
                     $complaint->assignee->name ?? 'Unassigned',
                     $complaint->created_at->format('Y-m-d H:i:s'),
                     $complaint->resolved_at ? $complaint->resolved_at->format('Y-m-d H:i:s') : 'N/A',
-                    $complaint->resolution_notes ?? 'N/A'
+                    $complaint->resolution_notes ?? 'N/A',
+                    $complaint->rating ?? 'Unrated',
+                    $complaint->feedback ?? 'N/A',
+                    $complaint->rated_at ? $complaint->rated_at->format('Y-m-d H:i:s') : 'N/A'
                 ]);
             }
 
