@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminSettingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\AnnouncementController;
 use Illuminate\Support\Facades\Route;
 
 // Guest Routes
@@ -39,6 +40,8 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/my-complaints', [ComplaintController::class, 'index'])->name('complaints.index');
     Route::get('/complaints/{id}', [ComplaintController::class, 'show'])->name('complaints.show');
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+    Route::get('/announcements', [AnnouncementController::class, 'userIndex'])->name('announcements.index');
+    Route::get('/announcements/{id}', [AnnouncementController::class, 'userShow'])->name('announcements.show');
 
     // Public Categories List AJAX
     Route::get('/api/categories', [ComplaintController::class, 'getCategories']);
@@ -64,6 +67,9 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::put('/notifications/read-all', [NotificationController::class, 'markAllRead']);
         Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
         Route::delete('/notifications', [NotificationController::class, 'destroyAll']);
+        
+        // Announcements API
+        Route::get('/announcements/active', [AnnouncementController::class, 'active']);
     });
 
     // Admin Dashboard & Views (Admin Middleware Protected)
@@ -78,6 +84,11 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/control-panel', [AdminController::class, 'controlPanel'])->name('control-panel');
         Route::get('/change-password', [AdminController::class, 'changePassword'])->name('change-password');
         Route::get('/system-health', [AdminController::class, 'systemHealth'])->name('system-health');
+
+        // Announcements Management
+        Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements');
+        Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+        Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
     });
 
     // Admin API AJAX Endpoints

@@ -228,10 +228,12 @@ class ComplaintController extends Controller
 
         // Audit Log
         AuditService::log(
+            Auth::id(),
             'complaint_rated',
+            'complaint',
             $complaint->id,
-            ['rating' => $complaint->rating, 'feedback' => $complaint->feedback],
-            null
+            null,
+            ['rating' => $complaint->rating, 'feedback' => $complaint->feedback]
         );
 
         return response()->json([

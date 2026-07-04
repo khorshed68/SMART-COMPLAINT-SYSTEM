@@ -520,7 +520,7 @@ $(document).ready(function() {
     $(document).on('click', '#category-suggestion-box', function() {
         const catId = $('#suggested-category-name').data('cat-id');
         if (catId) {
-            $('#complaint-category').val(catId);
+            $('#complaint-category').val(catId).change();
             $('#category-suggestion-box').addClass('d-none');
             Toast.show('Category suggestion applied!', 'success');
         }

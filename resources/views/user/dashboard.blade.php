@@ -8,6 +8,33 @@
 
 @section('content')
 <div class="container fade-in">
+    <!-- Campus Announcements Outage Banner -->
+    <div id="dashboard-announcements-container" class="mb-4 d-none">
+        <div class="card border-0 shadow-sm" style="border-left: 4px solid var(--warning) !important; background-color: rgba(243, 156, 18, 0.08); border-radius: 8px; overflow: hidden;">
+            <div class="card-body py-3 d-flex align-items-center gap-3">
+                <div class="bg-warning text-dark d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; font-size: 1.1rem;">
+                    <i class="fas fa-bullhorn animate-pulse"></i>
+                </div>
+                <div style="flex-grow: 1; overflow: hidden;">
+                    <div class="font-weight-bold" style="color: var(--dark); font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                        <span id="ann-badge-type" class="badge" style="font-size: 0.72rem; text-transform: uppercase;">Maintenance</span>
+                        <span id="ann-ticker-title">Loading active announcements...</span>
+                    </div>
+                    <p id="ann-ticker-desc" class="text-muted mb-0 mt-1" style="font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        Please stand by...
+                    </p>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                    <span id="ann-ticker-timer" class="badge bg-dark font-weight-bold" style="font-size: 0.78rem;"></span>
+                    <a href="/announcements" class="btn btn-sm btn-light font-weight-bold py-1 px-2.5" style="font-size: 0.72rem; border-radius: 4px; text-decoration: none;">View Board</a>
+                    <button class="btn btn-sm btn-outline-secondary border-0" id="btn-next-ann" style="padding: 4px 8px; display: none;">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Welcome Banner -->
     <div class="welcome-banner">
         <h1 class="welcome-title">Hello, {{ Auth::user()->name }}!</h1>
@@ -136,6 +163,71 @@
         setInterval(function() {
             loadDashboardStats();
         }, 30000);
+
+        // Load active announcements
+        let activeAnnouncements = [];
+        let currentAnnIndex = 0;
+
+        function loadActiveAnnouncements() {
+            $.get('/api/announcements/active', function(data) {
+                if (data.length === 0) {
+                    $('#dashboard-announcements-container').addClass('d-none');
+                    return;
+                }
+
+                activeAnnouncements = data;
+                currentAnnIndex = 0;
+                displayAnnouncement(currentAnnIndex);
+                $('#dashboard-announcements-container').removeClass('d-none');
+
+                if (data.length > 1) {
+                    $('#btn-next-ann').show();
+                } else {
+                    $('#btn-next-ann').hide();
+                }
+            });
+        }
+
+        function displayAnnouncement(index) {
+            if (activeAnnouncements.length === 0) return;
+            const ann = activeAnnouncements[index];
+            
+            // Set details
+            $('#ann-ticker-title').text(ann.title);
+            $('#ann-ticker-desc').text(ann.content);
+
+            if (ann.category) {
+                $('#ann-badge-type').text(ann.category.name).css('background-color', ann.category.color);
+            } else {
+                $('#ann-badge-type').text('Announcement').css('background-color', 'var(--warning)');
+            }
+
+            // Estimate time remaining
+            const endTime = new Date(ann.end_time);
+            const now = new Date();
+            const diffMs = endTime - now;
+            
+            if (diffMs > 0) {
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                
+                if (diffHours > 0) {
+                    $('#ann-ticker-timer').text(`Ends in ~${diffHours}h`).show();
+                } else {
+                    $('#ann-ticker-timer').text(`Ends in ~${diffMins}m`).show();
+                }
+            } else {
+                $('#ann-ticker-timer').hide();
+            }
+        }
+
+        $('#btn-next-ann').click(function() {
+            currentAnnIndex = (currentAnnIndex + 1) % activeAnnouncements.length;
+            displayAnnouncement(currentAnnIndex);
+        });
+
+        // Load active announcements immediately
+        loadActiveAnnouncements();
     });
 </script>
 @endsection

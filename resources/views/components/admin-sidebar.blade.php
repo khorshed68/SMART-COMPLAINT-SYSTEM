@@ -17,6 +17,9 @@
         <li class="sidebar-menu-item {{ Request::routeIs('admin.categories') ? 'active' : '' }}">
             <a href="{{ route('admin.categories') }}"><i class="fas fa-folder-open"></i> Categories</a>
         </li>
+        <li class="sidebar-menu-item {{ Request::routeIs('admin.announcements') ? 'active' : '' }}">
+            <a href="{{ route('admin.announcements') }}"><i class="fas fa-bullhorn"></i> Announcements</a>
+        </li>
         <li class="sidebar-menu-item {{ Request::routeIs('admin.analytics') ? 'active' : '' }}">
             <a href="{{ route('admin.analytics') }}"><i class="fas fa-chart-pie"></i> Analytics</a>
         </li>

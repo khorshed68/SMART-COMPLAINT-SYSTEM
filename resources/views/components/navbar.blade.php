@@ -14,6 +14,9 @@
         <li class="{{ Request::routeIs('complaints.index') ? 'active' : '' }}">
             <a href="{{ route('complaints.index') }}"><i class="fas fa-list-alt mr-1"></i> My Complaints</a>
         </li>
+        <li class="{{ Request::routeIs('announcements.index') || Request::routeIs('announcements.show') ? 'active' : '' }}">
+            <a href="/announcements"><i class="fas fa-bullhorn mr-1"></i> Announcements</a>
+        </li>
         <li class="{{ Request::routeIs('profile') ? 'active' : '' }}">
             <a href="{{ route('profile') }}"><i class="fas fa-user-cog mr-1"></i> Settings</a>
         </li>

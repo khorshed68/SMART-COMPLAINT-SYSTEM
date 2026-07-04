@@ -58,7 +58,9 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 mt-4 py-3">Log In</button>
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="submit" class="btn btn-primary py-3" style="width: 200px; font-weight: 600; border-radius: 8px;">Log In</button>
+                </div>
             </form>
 
             <div class="text-left mt-4" style="font-size: 0.9rem;">

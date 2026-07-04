@@ -48,6 +48,21 @@
                     </div>
                 </div>
 
+                <!-- Outage/Maintenance Alert Container -->
+                <div id="active-outage-alert" class="alert alert-warning border-0 shadow-sm d-none mb-3 fade-in" style="background-color: rgba(243, 156, 18, 0.08); border-left: 4px solid var(--warning) !important; border-radius: 8px;">
+                    <div class="d-flex gap-3">
+                        <div class="text-warning" style="font-size: 1.5rem;"><i class="fas fa-exclamation-triangle animate-pulse"></i></div>
+                        <div style="flex-grow: 1;">
+                            <h5 class="font-weight-bold mb-1" style="color: var(--dark); font-size: 0.95rem;">Active Outage / Maintenance Alert</h5>
+                            <p id="outage-alert-msg" class="mb-2" style="font-size: 0.85rem; color: #4a5568; line-height: 1.4;"></p>
+                            <div class="d-flex align-items-center justify-content-between" style="font-size: 0.78rem;">
+                                <span class="text-muted"><i class="far fa-clock mr-1"></i> Est. Resolution: <strong id="outage-alert-eta"></strong></span>
+                                <button type="button" class="btn btn-sm btn-dark font-weight-bold py-1 px-2.5" onclick="$('#active-outage-alert').addClass('d-none');" style="font-size: 0.72rem; border-radius: 4px;">Dismiss & Proceed</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="complaint-location">Location / Area</label>
                     <input type="text" id="complaint-location" name="location" class="form-control" placeholder="e.g. Hostel A Room 203, Central Library, CSE Seminar Room">
@@ -88,6 +103,30 @@
 
         // Initialize drag & drop uploader
         new FileUploadComponent('file-upload-zone', 'file-attachment', 'file-preview-container');
+
+        // Check for active maintenance when category changes
+        $('#complaint-category').change(function() {
+            const catId = $(this).val();
+            if (!catId) {
+                $('#active-outage-alert').addClass('d-none');
+                return;
+            }
+
+            $.get('/api/announcements/active', { category_id: catId }, function(data) {
+                // Use first returned announcement
+                const outage = data.length > 0 ? data[0] : null;
+                
+                if (outage) {
+                    $('#outage-alert-msg').html(`We are currently experiencing an active issue/maintenance: <strong>"${outage.title}"</strong>. <br><span class="text-muted" style="font-size:0.8rem; display:block; margin-top:4px;">Details: ${outage.content}</span>`);
+                    
+                    const endTime = new Date(outage.end_time);
+                    $('#outage-alert-eta').text(endTime.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }));
+                    $('#active-outage-alert').removeClass('d-none');
+                } else {
+                    $('#active-outage-alert').addClass('d-none');
+                }
+            });
+        });
     });
 </script>
 @endsection
