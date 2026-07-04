@@ -3,68 +3,99 @@
 @section('title', 'Register - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
-<div class="auth-wrapper fade-in">
-    <div class="auth-card slide-up" style="max-width: 550px;">
-        <h2 class="auth-title">Create Account</h2>
-        <p class="auth-subtitle">Join us to start submitting and tracking complaints</p>
-
-        <form onsubmit="submitRegister(event)" autocomplete="off" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-md-6" style="padding: 0 10px;">
-                    <div class="form-group">
-                        <label for="reg-name">Full Name</label>
-                        <input type="text" id="reg-name" name="name" class="form-control" placeholder="John Doe" required>
-                    </div>
+<div class="auth-split-container fade-in">
+    <div class="auth-split-card slide-up" style="max-width: 1050px; min-height: 680px;">
+        <!-- Left Banner Panel -->
+        <div class="auth-split-visual">
+            <div class="auth-visual-header">
+                <span class="auth-logo">SCS</span>
+                <a href="/" class="auth-back-link">Back to website &rarr;</a>
+            </div>
+            
+            <div class="auth-visual-footer">
+                <h3 class="auth-visual-slogan">
+                    Join Us,<br>
+                    Submit & Track Issues.
+                </h3>
+                <div class="auth-slider-dots">
+                    <span class="auth-dot"></span>
+                    <span class="auth-dot active"></span>
+                    <span class="auth-dot"></span>
                 </div>
-                <div class="col-md-6" style="padding: 0 10px;">
-                    <div class="form-group">
-                        <label for="reg-phone">Phone Number</label>
-                        <input type="text" id="reg-phone" name="phone" class="form-control" placeholder="+123456789">
-                    </div>
-                </div>
             </div>
+        </div>
+        
+        <!-- Right Form Panel -->
+        <div class="auth-split-form" style="padding: 35px 45px;">
+            <h2 class="auth-title" style="font-size: 2rem; margin-bottom: 4px;">Create an account</h2>
+            <p class="auth-subtitle" style="margin-bottom: 20px;">
+                Already have an account? <a href="{{ route('login') }}" style="color: #705ecf; text-decoration: none; font-weight: 600;">Log in</a>
+            </p>
 
-            <div class="form-group">
-                <label for="reg-email">Email Address</label>
-                <input type="email" id="reg-email" name="email" class="form-control" placeholder="john@example.com" required onkeyup="checkEmailAvailability(this.value, 'email-feedback')">
-                <div id="email-feedback" class="mt-2" style="font-size: 0.8rem;"></div>
-            </div>
-
-            <div class="form-group">
-                <label for="reg-dept">Department</label>
-                <input type="text" id="reg-dept" name="department" class="form-control" placeholder="e.g. Computer Science">
-            </div>
-
-            <div class="form-group">
-                <label for="reg-avatar">Profile Picture (Optional)</label>
-                <input type="file" id="reg-avatar" name="avatar" class="form-control" accept="image/*">
-            </div>
-
-            <div class="row">
-                <div class="col-md-6" style="padding: 0 10px;">
-                    <div class="form-group">
-                        <label for="reg-password">Password</label>
-                        <input type="password" id="reg-password" name="password" class="form-control" placeholder="••••••••" required onkeyup="checkPasswordStrength(this.value)">
-                        <div class="strength-meter">
-                            <div id="strength-bar" class="strength-bar"></div>
+            <form onsubmit="submitRegister(event)" autocomplete="off" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-6" style="padding: 0 8px;">
+                        <div class="form-group">
+                            <label for="reg-name">Full Name</label>
+                            <input type="text" id="reg-name" name="name" class="form-control" placeholder="John Doe" required>
                         </div>
-                        <div id="strength-text" class="strength-text text-muted">Weak</div>
+                    </div>
+                    <div class="col-md-6" style="padding: 0 8px;">
+                        <div class="form-group">
+                            <label for="reg-phone">Phone Number</label>
+                            <input type="text" id="reg-phone" name="phone" class="form-control" placeholder="+123456789">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6" style="padding: 0 10px;">
-                    <div class="form-group">
-                        <label for="reg-confirm">Confirm Password</label>
-                        <input type="password" id="reg-confirm" name="password_confirmation" class="form-control" placeholder="••••••••" required>
+
+                <div class="form-group">
+                    <label for="reg-email">Email Address</label>
+                    <input type="email" id="reg-email" name="email" class="form-control" placeholder="john@example.com" required onkeyup="checkEmailAvailability(this.value, 'email-feedback')">
+                    <div id="email-feedback" class="mt-2" style="font-size: 0.8rem;"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6" style="padding: 0 8px;">
+                        <div class="form-group">
+                            <label for="reg-dept">Department</label>
+                            <input type="text" id="reg-dept" name="department" class="form-control" placeholder="e.g. Computer Science">
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="padding: 0 8px;">
+                        <div class="form-group">
+                            <label for="reg-avatar">Profile Picture (Optional)</label>
+                            <input type="file" id="reg-avatar" name="avatar" class="form-control" accept="image/*" style="padding: 7px 12px !important;">
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <button type="submit" class="btn btn-primary w-100 mt-4 py-3" style="font-weight: 600;">Create Account</button>
-        </form>
+                <div class="row">
+                    <div class="col-md-6" style="padding: 0 8px;">
+                        <div class="form-group">
+                            <label for="reg-password">Password</label>
+                            <input type="password" id="reg-password" name="password" class="form-control" placeholder="••••••••" required onkeyup="checkPasswordStrength(this.value)">
+                            <div class="strength-meter">
+                                <div id="strength-bar" class="strength-bar"></div>
+                            </div>
+                            <div id="strength-text" class="strength-text text-muted">Weak</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="padding: 0 8px;">
+                        <div class="form-group">
+                            <label for="reg-confirm">Confirm Password</label>
+                            <input type="password" id="reg-confirm" name="password_confirmation" class="form-control" placeholder="••••••••" required>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="text-center mt-4" style="font-size: 0.9rem;">
-            <span class="text-muted">Already have an account?</span>
-            <a href="{{ route('login') }}" class="font-weight-bold" style="color: var(--primary); text-decoration: none;">Log In</a>
+                <div class="form-group mb-2">
+                    <label class="auth-checkbox-label">
+                        <input type="checkbox" required> I agree to the <a href="#" style="color: #705ecf; text-decoration: underline;">Terms & Conditions</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mt-3 py-3">Create Account</button>
+            </form>
         </div>
     </div>
 </div>

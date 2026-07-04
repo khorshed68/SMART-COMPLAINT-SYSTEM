@@ -697,3 +697,186 @@ body.dark-mode .rating-stars-select .star-btn.hovered,
 body.dark-mode .rating-stars-select .star-btn.selected {
     color: #f1c40f;
 }
+
+/* Split Layout Auth Panel styling */
+.auth-split-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #0f0d15;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    width: 100%;
+}
+.auth-split-card {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 980px;
+    min-height: 580px;
+    background-color: #1d1a27;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.auth-split-visual {
+    width: 46%;
+    position: relative;
+    background-image: url('../images/login_banner.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 35px;
+    color: #ffffff;
+}
+.auth-split-visual::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(29, 26, 39, 0.1) 0%, rgba(29, 26, 39, 0.7) 100%);
+    z-index: 1;
+}
+.auth-visual-header {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.auth-logo {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #fff;
+    text-transform: uppercase;
+}
+.auth-back-link {
+    background-color: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    color: #fff !important;
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+.auth-back-link:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+.auth-visual-footer {
+    position: relative;
+    z-index: 2;
+}
+.auth-visual-slogan {
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.35;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+.auth-slider-dots {
+    display: flex;
+    gap: 8px;
+}
+.auth-dot {
+    width: 24px;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+}
+.auth-dot.active {
+    background-color: #ffffff;
+}
+
+.auth-split-form {
+    width: 54%;
+    padding: 45px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #e2e8f0;
+}
+.auth-split-form .auth-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 8px;
+    text-align: left;
+}
+.auth-split-form .auth-subtitle {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 28px;
+    text-align: left;
+}
+.auth-split-form .form-group {
+    margin-bottom: 20px;
+}
+.auth-split-form .form-group label {
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    margin-bottom: 8px;
+    font-weight: 500;
+    display: block;
+}
+.auth-split-form .form-control,
+.auth-split-form .form-select {
+    background-color: #2b2738 !important;
+    border: 1px solid #3d374e !important;
+    color: #f8fafc !important;
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    font-size: 0.92rem !important;
+    width: 100%;
+}
+.auth-split-form .form-control:focus,
+.auth-split-form .form-select:focus {
+    border-color: #705ecf !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(112, 94, 207, 0.25) !important;
+}
+.auth-split-form .form-control::placeholder {
+    color: #64748b !important;
+}
+.auth-split-form .btn-primary {
+    background-color: #705ecf !important;
+    border-color: #705ecf !important;
+    color: #ffffff !important;
+    padding: 14px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: background-color 0.2s ease !important;
+}
+.auth-split-form .btn-primary:hover {
+    background-color: #5d4eb3 !important;
+    border-color: #5d4eb3 !important;
+}
+
+@media (max-width: 820px) {
+    .auth-split-card {
+        flex-direction: column;
+        max-width: 480px;
+        min-height: auto;
+    }
+    .auth-split-visual {
+        width: 100%;
+        min-height: 250px;
+        padding: 25px;
+    }
+    .auth-split-form {
+        width: 100%;
+        padding: 35px 25px;
+    }
+    .auth-split-form .auth-title {
+        font-size: 1.8rem;
+    }
+}
