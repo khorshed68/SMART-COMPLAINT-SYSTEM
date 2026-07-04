@@ -22,6 +22,9 @@
                             <select id="complaint-category" name="category_id" class="form-select" required>
                                 <!-- Loaded via AJAX -->
                             </select>
+                            <div id="category-suggestion-box" class="mt-2 d-none" style="font-size: 0.8rem; color: var(--primary); font-weight: 600; cursor: pointer; animation: fadeIn 0.3s ease; background-color: rgba(52, 152, 219, 0.08); padding: 8px 12px; border-radius: 6px; border: 1px dashed rgba(52, 152, 219, 0.3);">
+                                <i class="fas fa-lightbulb text-warning"></i> Suggested: <span id="suggested-category-name" style="text-decoration: underline;">Internet</span> (Click to apply)
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-6" style="padding: 0 10px;">
@@ -37,6 +40,9 @@
                                 <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem;">
                                     <input type="radio" name="priority" value="High" style="accent-color: var(--danger);"> High
                                 </label>
+                            </div>
+                            <div id="priority-suggestion-box" class="mt-1 d-none" style="font-size: 0.8rem; color: var(--primary); font-weight: 600; cursor: pointer; animation: fadeIn 0.3s ease; background-color: rgba(52, 152, 219, 0.08); padding: 8px 12px; border-radius: 6px; border: 1px dashed rgba(52, 152, 219, 0.3); margin-top: -5px;">
+                                <i class="fas fa-exclamation-circle text-warning"></i> Recommended: <span id="suggested-priority-name" style="text-decoration: underline;">High</span> (Click to apply)
                             </div>
                         </div>
                     </div>

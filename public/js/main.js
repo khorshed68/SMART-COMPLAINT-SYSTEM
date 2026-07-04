@@ -409,4 +409,129 @@ $(document).ready(function() {
             }
         });
     });
+
+    // ==========================================
+    // AI-Powered Category & Priority Suggestion
+    // ==========================================
+    const categoryKeywords = {
+        'Electrical': ['light', 'power', 'switch', 'wire', 'plug', 'short', 'voltage', 'current', 'fan', 'ac', 'bulb', 'flicker', 'fuse', 'generator'],
+        'Internet': ['wifi', 'internet', 'router', 'network', 'connect', 'slow', 'speed', 'offline', 'lan', 'cable', 'broadband', 'wi-fi'],
+        'Maintenance': ['wrench', 'repair', 'broken', 'fix', 'door', 'window', 'wall', 'paint', 'key', 'handle', 'hinge', 'plaster', 'cracked'],
+        'Plumbing': ['leak', 'water', 'pipe', 'tap', 'faucet', 'clog', 'drain', 'sink', 'flush', 'toilet', 'shower', 'basin', 'overflow', 'plumb'],
+        'Cleaning': ['trash', 'dirt', 'sweep', 'mop', 'garbage', 'smell', 'dust', 'dirty', 'clean', 'spill', 'washroom', 'odor', 'litter'],
+        'Security': ['gate', 'lock', 'stranger', 'theft', 'steal', 'guard', 'camera', 'cctv', 'threat', 'safety', 'intruder', 'stolen', 'robbery'],
+        'Mess & Food': ['mess', 'food', 'cafeteria', 'meal', 'water', 'cook', 'dining', 'lunch', 'dinner', 'breakfast', 'taste', 'hygiene', 'kitchen'],
+        'Carpentry & Furniture': ['chair', 'table', 'bed', 'desk', 'furniture', 'wood', 'drawer', 'wardrobe', 'shelf', 'cupboard', 'stool'],
+        'Academic Facilities': ['class', 'library', 'board', 'marker', 'projector', 'bench', 'lecture', 'classroom', 'hall', 'auditorium', 'desk'],
+        'IT & Lab Equipment': ['computer', 'pc', 'monitor', 'mouse', 'keyboard', 'lab', 'printer', 'software', 'hardware', 'screen', 'cpu'],
+        'Medical & Health': ['health', 'doctor', 'clinic', 'medicine', 'first aid', 'sick', 'pain', 'emergency', 'injury', 'blood', 'pill'],
+        'Transportation & Parking': ['car', 'parking', 'shuttle', 'bus', 'vehicle', 'permit', 'bike', 'cycle', 'scooter']
+    };
+
+    const priorityKeywords = {
+        'High': ['urgent', 'immediate', 'emergency', 'danger', 'theft', 'stolen', 'injury', 'smoke', 'fire', 'critical', 'safety', 'flooding', 'accident', 'robbery', 'shock', 'high voltage', 'broken lock', 'gate open'],
+        'Medium': ['broken', 'no wifi', 'slow', 'flicker', 'dirty', 'leak', 'repair', 'fix', 'clogged', 'smell', 'no power'],
+        'Low': ['minor', 'suggest', 'dusty', 'cleaning', 'paint', 'marker', 'scratch', 'aesthetic']
+    };
+
+    // Keep track of loaded categories to map name -> ID
+    let dbCategories = [];
+    
+    // Load categories mapping when on submit page
+    if ($('#complaint-category').length > 0) {
+        $.get('/api/categories', function(categories) {
+            dbCategories = categories;
+        });
+    }
+
+    function analyzeText() {
+        const title = $('#complaint-title').val().toLowerCase();
+        const desc = $('#complaint-desc').val().toLowerCase();
+        const combinedText = title + ' ' + desc;
+
+        if (combinedText.trim().length < 3) {
+            $('#category-suggestion-box').addClass('d-none');
+            $('#priority-suggestion-box').addClass('d-none');
+            return;
+        }
+
+        // 1. Analyze Category
+        let suggestedCategory = null;
+        let maxCategoryMatches = 0;
+
+        for (const [catName, keywords] of Object.entries(categoryKeywords)) {
+            let matches = 0;
+            keywords.forEach(word => {
+                if (combinedText.includes(word)) {
+                    matches++;
+                }
+            });
+
+            if (matches > maxCategoryMatches) {
+                maxCategoryMatches = matches;
+                suggestedCategory = catName;
+            }
+        }
+
+        // Display category suggestion if matched
+        if (suggestedCategory && maxCategoryMatches > 0) {
+            const dbCat = dbCategories.find(c => c.name.toLowerCase() === suggestedCategory.toLowerCase());
+            if (dbCat && $('#complaint-category').val() != dbCat.id) {
+                $('#suggested-category-name').text(dbCat.name).data('cat-id', dbCat.id);
+                $('#category-suggestion-box').removeClass('d-none');
+            } else {
+                $('#category-suggestion-box').addClass('d-none');
+            }
+        } else {
+            $('#category-suggestion-box').addClass('d-none');
+        }
+
+        // 2. Analyze Priority
+        let suggestedPriority = null;
+        
+        // Check High priority keywords first
+        const hasHigh = priorityKeywords.High.some(word => combinedText.includes(word));
+        const hasMedium = priorityKeywords.Medium.some(word => combinedText.includes(word));
+        
+        if (hasHigh) {
+            suggestedPriority = 'High';
+        } else if (hasMedium) {
+            suggestedPriority = 'Medium';
+        } else {
+            suggestedPriority = 'Low';
+        }
+
+        // Get currently selected priority
+        const currentPriority = $('input[name="priority"]:checked').val();
+
+        if (suggestedPriority && currentPriority !== suggestedPriority) {
+            $('#suggested-priority-name').text(suggestedPriority);
+            $('#priority-suggestion-box').removeClass('d-none');
+        } else {
+            $('#priority-suggestion-box').addClass('d-none');
+        }
+    }
+
+    // Debounced text inputs listeners
+    const debouncedAnalyze = debounce(analyzeText, 300);
+    $(document).on('keyup change', '#complaint-title, #complaint-desc', debouncedAnalyze);
+
+    // Apply suggestions on click
+    $(document).on('click', '#category-suggestion-box', function() {
+        const catId = $('#suggested-category-name').data('cat-id');
+        if (catId) {
+            $('#complaint-category').val(catId);
+            $('#category-suggestion-box').addClass('d-none');
+            Toast.show('Category suggestion applied!', 'success');
+        }
+    });
+
+    $(document).on('click', '#priority-suggestion-box', function() {
+        const priorityVal = $('#suggested-priority-name').text();
+        if (priorityVal) {
+            $(`input[name="priority"][value="${priorityVal}"]`).prop('checked', true);
+            $('#priority-suggestion-box').addClass('d-none');
+            Toast.show(`Priority recommended as ${priorityVal} applied!`, 'success');
+        }
+    });
 });
