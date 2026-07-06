@@ -26,7 +26,7 @@ return new class extends Migration
             $table->dateTime('resolved_at')->nullable();
             $table->timestamps();
 
-            $table->index(['user_id', 'category_id', 'status', 'priority', 'assigned_to', 'created_at']);
+            $table->index(['user_id', 'category_id', 'status', 'priority', 'assigned_to', 'created_at'], 'complaints_search_idx');
         });
     }
 
