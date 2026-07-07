@@ -702,7 +702,11 @@ body.dark-mode .rating-stars-select .star-btn.selected {
 .auth-split-container {
     display: flex;
     min-height: 100vh;
-    background-color: #0f0d15;
+    background-color: #09080e;
+    background-image: 
+        radial-gradient(circle at 15% 20%, rgba(112, 94, 207, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(79, 70, 229, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.04) 0%, transparent 50%);
     align-items: center;
     justify-content: center;
     padding: 20px;

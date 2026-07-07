@@ -94,7 +94,7 @@ function submitLogin(event) {
     submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Logging in...');
 
     $.ajax({
-        url: '/login',
+        url: $(form).attr('action') || '/login',
         method: 'POST',
         data: formData,
         dataType: 'json',

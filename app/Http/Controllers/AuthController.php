@@ -28,6 +28,44 @@ class AuthController extends Controller
     }
 
     /**
+     * Show the admin login form.
+     */
+    public function showAdminLoginForm()
+    {
+        if (Auth::check()) {
+            return Auth::user()->isAdmin()
+                ? redirect()->route('admin.dashboard')
+                : redirect()->route('dashboard');
+        }
+        return view('auth.admin-login');
+    }
+
+    /**
+     * Handle admin authentication.
+     */
+    public function adminLogin(LoginRequest $request)
+    {
+        $credentials = $request->only('email', 'password');
+        
+        $user = User::where('email', $credentials['email'])->first();
+
+        if ($user && $user->role !== 'admin') {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. This portal is reserved for system administrators.'
+                ], 403);
+            }
+
+            return back()->withErrors([
+                'email' => 'Access denied. This portal is reserved for system administrators.',
+            ])->withInput($request->only('email'));
+        }
+
+        return $this->login($request);
+    }
+
+    /**
      * Handle authentication.
      */
     public function login(LoginRequest $request)

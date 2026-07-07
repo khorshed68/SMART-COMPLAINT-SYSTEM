@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Log In - ' . setting('site_name', 'Smart Complaint System'))
+@section('title', 'Admin Login - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
 <div class="auth-split-container fade-in">
     <div class="auth-split-card slide-up">
         <!-- Left Banner Panel -->
-        <div class="auth-split-visual">
+        <div class="auth-split-visual" style="background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%);">
             <div class="auth-visual-header">
                 <span class="auth-logo">SCS</span>
                 <a href="/" class="auth-back-link">Back to website &rarr;</a>
@@ -14,8 +14,8 @@
             
             <div class="auth-visual-footer">
                 <h3 class="auth-visual-slogan">
-                    Resolving Issues,<br>
-                    Building Trust.
+                    Admin Console.<br>
+                    Managing Issues.
                 </h3>
                 <div class="auth-slider-dots">
                     <span class="auth-dot active"></span>
@@ -27,13 +27,13 @@
         
         <!-- Right Form Panel -->
         <div class="auth-split-form" style="position: relative;">
-            <a href="{{ route('admin.login') }}" class="btn btn-outline-primary" style="position: absolute; right: 25px; top: 25px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border: 1px solid rgba(112, 94, 207, 0.4); color: #bca8ff; background: rgba(112, 94, 207, 0.05); text-decoration: none; transition: all 0.2s ease;">
-                <i class="fas fa-shield-alt mr-1"></i> Admin Login
+            <a href="{{ route('login') }}" class="btn btn-outline-primary" style="position: absolute; right: 25px; top: 25px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border: 1px solid rgba(112, 94, 207, 0.4); color: #bca8ff; background: rgba(112, 94, 207, 0.05); text-decoration: none; transition: all 0.2s ease;">
+                <i class="fas fa-user mr-1"></i> Student Login
             </a>
             
-            <h2 class="auth-title">Welcome Back</h2>
+            <h2 class="auth-title">Admin Console</h2>
             <p class="auth-subtitle">
-                Please log in to manage your complaints.
+                Please log in to control the admin portal.
             </p>
 
             @if(session('success'))
@@ -44,10 +44,10 @@
                 <div class="alert alert-danger mb-3">{{ session('error') }}</div>
             @endif
 
-            <form onsubmit="submitLogin(event)" autocomplete="off">
+            <form action="{{ route('admin.login') }}" onsubmit="submitLogin(event)" autocomplete="off">
                 <div class="form-group">
-                    <label for="login-email">Email Address</label>
-                    <input type="email" id="login-email" name="email" class="form-control" placeholder="name@example.com" required autofocus>
+                    <label for="login-email">Admin Email Address</label>
+                    <input type="email" id="login-email" name="email" class="form-control" placeholder="admin@example.com" required autofocus>
                 </div>
                 
                 <div class="form-group">
@@ -66,11 +66,6 @@
                     <button type="submit" class="btn btn-primary py-3" style="width: 200px; font-weight: 600; border-radius: 8px;">Log In</button>
                 </div>
             </form>
-
-            <div class="text-left mt-4" style="font-size: 0.9rem;">
-                <span class="text-muted">Don't have an account?</span>
-                <a href="{{ route('register') }}" class="font-weight-bold" style="color: #705ecf; text-decoration: none;">Register Now</a>
-            </div>
         </div>
     </div>
 </div>
