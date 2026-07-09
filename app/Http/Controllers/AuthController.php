@@ -22,11 +22,22 @@ class AuthController extends Controller
         if (Auth::check()) {
             /** @var \App\Models\User $user */
             $user = Auth::user();
-            return $user->isAdmin()
-                ? redirect()->route('admin.dashboard')
-                : redirect()->route('dashboard');
+            return $this->redirectByUserRole($user);
         }
         return view('auth.login');
+    }
+
+    /**
+     * Show the staff login form.
+     */
+    public function showStaffLoginForm()
+    {
+        if (Auth::check()) {
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            return $this->redirectByUserRole($user);
+        }
+        return view('auth.staff-login');
     }
 
     /**
@@ -37,9 +48,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             /** @var \App\Models\User $user */
             $user = Auth::user();
-            return $user->isAdmin()
-                ? redirect()->route('admin.dashboard')
-                : redirect()->route('dashboard');
+            return $this->redirectByUserRole($user);
         }
         return view('auth.admin-login');
     }
@@ -122,14 +131,12 @@ class AuthController extends Controller
                 if ($request->expectsJson()) {
                     return response()->json([
                         'success' => true,
-                        'redirect' => $user->isAdmin() ? route('admin.dashboard') : route('dashboard'),
+                        'redirect' => $this->getRedirectUrl($user),
                         'user' => $user
                     ]);
                 }
 
-                return $user->isAdmin()
-                    ? redirect()->route('admin.dashboard')
-                    : redirect()->route('dashboard');
+                return $this->redirectByUserRole($user);
             }
 
             // Increment login attempts
@@ -172,9 +179,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             /** @var \App\Models\User $user */
             $user = Auth::user();
-            return $user->isAdmin()
-                ? redirect()->route('admin.dashboard')
-                : redirect()->route('dashboard');
+            return $this->redirectByUserRole($user);
         }
         return view('auth.register');
     }
@@ -223,6 +228,62 @@ class AuthController extends Controller
     }
 
     /**
+     * Show the staff registration form.
+     */
+    public function showStaffRegistrationForm()
+    {
+        if (Auth::check()) {
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            return $this->redirectByUserRole($user);
+        }
+        return view('auth.staff-register');
+    }
+
+    /**
+     * Handle staff registration.
+     */
+    public function staffRegister(RegisterRequest $request)
+    {
+        $avatarPath = null;
+        if ($request->hasFile('avatar')) {
+            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'department' => $request->department,
+            'role' => 'staff',
+            'status' => 'pending', // Awaiting administrator approval
+            'avatar' => $avatarPath,
+        ]);
+
+        // Send Welcome Email
+        try {
+            if (setting('enable_email_notifications', '1') === '1') {
+                Mail::to($user->email)->send(new WelcomeEmail($user));
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to send welcome email to staff {$user->email}: " . $e->getMessage());
+        }
+
+        $regMessage = 'Registration successful! Your staff account is pending administrator approval.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $regMessage,
+                'redirect' => route('staff.login')
+            ]);
+        }
+
+        return redirect()->route('staff.login')->with('success', $regMessage);
+    }
+
+    /**
      * Check if email exists (AJAX validation).
      */
     public function checkEmail(Request $request)
@@ -249,5 +310,31 @@ class AuthController extends Controller
         }
 
         return redirect()->route('login');
+    }
+
+    /**
+     * Redirect helper based on user role.
+     */
+    protected function redirectByUserRole($user)
+    {
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role === 'staff') {
+            return redirect()->route('staff.dashboard');
+        }
+        return redirect()->route('dashboard');
+    }
+
+    /**
+     * Get redirect URL string based on user role.
+     */
+    protected function getRedirectUrl($user)
+    {
+        if ($user->role === 'admin') {
+            return route('admin.dashboard');
+        } elseif ($user->role === 'staff') {
+            return route('staff.dashboard');
+        }
+        return route('dashboard');
     }
 }

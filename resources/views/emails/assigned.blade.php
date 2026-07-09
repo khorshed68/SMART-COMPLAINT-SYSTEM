@@ -36,7 +36,7 @@
             <p>Please review the details and updates, and post status adjustments or comments as required:</p>
             
             <center>
-                <a href="{{ route('admin.complaints.show', $complaint->id) }}" class="btn" style="color: #ffffff;">View Admin Complaint Panel</a>
+                <a href="{{ $user->role === 'staff' ? route('staff.complaints.show', $complaint->id) : route('admin.complaints.show', $complaint->id) }}" class="btn" style="color: #ffffff; text-decoration: none;">View Complaint Workspace</a>
             </center>
         </div>
         <div class="footer">

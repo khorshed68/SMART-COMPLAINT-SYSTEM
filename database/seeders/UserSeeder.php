@@ -47,6 +47,17 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'name' => 'Sheikh Khorshed (Plumber)',
+                'email' => 'plumber@complaint.system',
+                'password' => Hash::make('admin123'),
+                'role' => 'staff',
+                'phone' => '01712345678',
+                'department' => 'Maintenance & Plumbing',
+                'status' => 'active',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ];
 
         DB::table('users')->insert($users);

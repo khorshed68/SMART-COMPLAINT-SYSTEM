@@ -80,7 +80,7 @@ class User extends Authenticatable
      */
     public function scopeAdmins(Builder $query): Builder
     {
-        return $query->where('role', 'admin');
+        return $query->whereIn('role', ['admin', 'staff']);
     }
 
     /**

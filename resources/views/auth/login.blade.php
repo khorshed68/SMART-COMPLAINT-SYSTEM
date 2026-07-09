@@ -27,9 +27,14 @@
         
         <!-- Right Form Panel -->
         <div class="auth-split-form" style="position: relative;">
-            <a href="{{ route('admin.login') }}" class="btn btn-outline-primary" style="position: absolute; right: 25px; top: 25px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border: 1px solid rgba(112, 94, 207, 0.4); color: #bca8ff; background: rgba(112, 94, 207, 0.05); text-decoration: none; transition: all 0.2s ease;">
-                <i class="fas fa-shield-alt mr-1"></i> Admin Login
-            </a>
+            <div style="position: absolute; right: 25px; top: 25px; display: flex; gap: 8px;">
+                <a href="{{ route('admin.login') }}" class="btn btn-outline-primary" style="border-radius: 20px; font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border: 1px solid rgba(112, 94, 207, 0.4); color: #bca8ff; background: rgba(112, 94, 207, 0.05); text-decoration: none; transition: all 0.2s ease;">
+                    <i class="fas fa-shield-alt mr-1"></i> Admin Login
+                </a>
+                <a href="{{ route('staff.login') }}" class="btn btn-outline-primary" style="border-radius: 20px; font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border: 1px solid rgba(112, 94, 207, 0.4); color: #bca8ff; background: rgba(112, 94, 207, 0.05); text-decoration: none; transition: all 0.2s ease;">
+                    <i class="fas fa-tools mr-1"></i> Staff Login
+                </a>
+            </div>
             
             <h2 class="auth-title">Welcome Back</h2>
             <p class="auth-subtitle">

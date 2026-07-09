@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Register - ' . setting('site_name', 'Smart Complaint System'))
+@section('title', 'Staff Registration - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
 <div class="auth-split-container fade-in">
     <div class="auth-split-card slide-up" style="max-width: 1050px; min-height: 680px;">
         <!-- Left Banner Panel -->
-        <div class="auth-split-visual">
+        <div class="auth-split-visual" style="background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.45) 0%, rgba(49, 46, 129, 0.45) 100%), url('{{ asset('images/login_banner.png') }}'); background-size: cover; background-position: center;">
             <div class="auth-visual-header">
                 <span class="auth-logo">SCS</span>
                 <a href="/" class="auth-back-link">Back to website &rarr;</a>
@@ -14,8 +14,8 @@
             
             <div class="auth-visual-footer">
                 <h3 class="auth-visual-slogan">
-                    Join Us,<br>
-                    Submit & Track Issues.
+                    Join Our Crew,<br>
+                    Resolve Campus Issues.
                 </h3>
                 <div class="auth-slider-dots">
                     <span class="auth-dot"></span>
@@ -28,38 +28,47 @@
         <!-- Right Form Panel -->
         <div class="auth-split-form" style="padding: 35px 45px; position: relative;">
             
-            <h2 class="auth-title" style="font-size: 2rem; margin-bottom: 4px;">Create an account</h2>
+            <h2 class="auth-title" style="font-size: 2rem; margin-bottom: 4px;">Create Staff Account</h2>
             <p class="auth-subtitle" style="margin-bottom: 20px;">
-                Already have an account? <a href="{{ route('login') }}" style="color: #705ecf; text-decoration: none; font-weight: 600;">Log in</a>
+                Already have a staff account? <a href="{{ route('staff.login') }}" style="color: #705ecf; text-decoration: none; font-weight: 600;">Log in</a>
             </p>
 
-            <form onsubmit="submitRegister(event)" autocomplete="off" enctype="multipart/form-data">
+            <form action="/staff/register" onsubmit="submitRegister(event)" autocomplete="off" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-6" style="padding: 0 8px;">
                         <div class="form-group">
                             <label for="reg-name">Full Name</label>
-                            <input type="text" id="reg-name" name="name" class="form-control" placeholder="John Doe" required>
+                            <input type="text" id="reg-name" name="name" class="form-control" placeholder="Sheikh Khorshed" required>
                         </div>
                     </div>
                     <div class="col-md-6" style="padding: 0 8px;">
                         <div class="form-group">
                             <label for="reg-phone">Phone Number</label>
-                            <input type="text" id="reg-phone" name="phone" class="form-control" placeholder="+123456789">
+                            <input type="text" id="reg-phone" name="phone" class="form-control" placeholder="017XXXXXXXX" required>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="reg-email">Email Address</label>
-                    <input type="email" id="reg-email" name="email" class="form-control" placeholder="john@example.com" required onkeyup="checkEmailAvailability(this.value, 'email-feedback')" readonly onfocus="this.removeAttribute('readonly');">
+                    <label for="reg-email">Staff Email Address</label>
+                    <input type="email" id="reg-email" name="email" class="form-control" placeholder="plumber@complaint.system" required onkeyup="checkEmailAvailability(this.value, 'email-feedback')" readonly onfocus="this.removeAttribute('readonly');">
                     <div id="email-feedback" class="mt-2" style="font-size: 0.8rem;"></div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6" style="padding: 0 8px;">
                         <div class="form-group">
-                            <label for="reg-dept">Department</label>
-                            <input type="text" id="reg-dept" name="department" class="form-control" placeholder="e.g. Computer Science">
+                            <label for="reg-dept">Assign Department</label>
+                            <select id="reg-dept" name="department" class="form-select" required>
+                                <option value="">Select Specialty / Department</option>
+                                <option value="Maintenance & Plumbing">Maintenance & Plumbing</option>
+                                <option value="Electrical Department">Electrical Department</option>
+                                <option value="IT & Network Services">IT & Network Services</option>
+                                <option value="Carpentry & Infrastructure">Carpentry & Infrastructure</option>
+                                <option value="Housekeeping & Cleaning">Housekeeping & Cleaning</option>
+                                <option value="Administration & Security">Administration & Security</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-6" style="padding: 0 8px;">
@@ -74,7 +83,7 @@
                     <div class="col-md-6" style="padding: 0 8px;">
                         <div class="form-group">
                             <label for="reg-password">Password</label>
-                            <input type="password" id="reg-password" name="password" class="form-control" placeholder="••••••••" required onkeyup="checkPasswordStrength(this.value)" readonly onfocus="this.removeAttribute('readonly');">
+                            <input type="password" id="reg-password" name="password" class="form-control" placeholder="••••••••" required onkeyup="checkPasswordStrength(val => {})" readonly onfocus="this.removeAttribute('readonly');">
                             <div class="strength-meter">
                                 <div id="strength-bar" class="strength-bar"></div>
                             </div>
@@ -89,7 +98,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 mt-3 py-3">Create Account</button>
+                <button type="submit" class="btn btn-primary w-100 mt-3 py-3">Create Staff Account</button>
             </form>
         </div>
     </div>
@@ -98,7 +107,9 @@
 
 @section('scripts')
 <script>
-    function checkPasswordStrength(val) {
+    // Real-time password strength meter helper
+    $('#reg-password').on('keyup', function() {
+        const val = this.value;
         const bar = document.getElementById('strength-bar');
         const text = document.getElementById('strength-text');
         
@@ -131,18 +142,17 @@
             text.textContent = 'Strong';
             text.style.color = 'var(--secondary)';
         }
-    }
+    });
 
     $(document).ready(function() {
-        // Immediate profile picture size check on selection
+        // Immediate profile picture size check
         $('#reg-avatar').change(function() {
             if (this.files && this.files.length > 0) {
                 const file = this.files[0];
                 const maxSize = 2 * 1024 * 1024; // 2MB
                 if (file.size > maxSize) {
-                    // Clear the file selection
                     $(this).val('');
-                    Toast.show('The selected picture size is too large. Please upload a smaller image (under 2MB).', 'warning');
+                    Toast.show('The selected picture size is too large. Please upload an image under 2MB.', 'warning');
                 }
             }
         });

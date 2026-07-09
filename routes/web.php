@@ -11,6 +11,7 @@ use App\Http\Controllers\AdminSettingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 // Guest Routes
@@ -24,6 +25,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/admin/login', [AuthController::class, 'adminLogin']);
     Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/staff/register', [AuthController::class, 'showStaffRegistrationForm'])->name('staff.register');
+    Route::post('/staff/register', [AuthController::class, 'staffRegister']);
+    Route::get('/staff/login', [AuthController::class, 'showStaffLoginForm'])->name('staff.login');
     
     // AJAX: Guest email validation
     Route::post('/api/auth/check-email', [AuthController::class, 'checkEmail']);
@@ -130,5 +134,18 @@ Route::middleware(['auth', 'active'])->group(function () {
         // Audit Logs & System Health
         Route::get('/audit-logs', [AdminController::class, 'getAuditLogs']);
         Route::get('/system-health', [AdminController::class, 'getSystemHealth']);
+    });
+
+    // Staff Dashboard & Operations (Staff Middleware Protected)
+    Route::middleware('staff')->prefix('staff')->name('staff.')->group(function () {
+        Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('dashboard');
+        Route::get('/complaints/{id}', [StaffController::class, 'show'])->name('complaints.show');
+    });
+
+    // Staff AJAX API Endpoints
+    Route::middleware('staff')->prefix('api/staff')->group(function () {
+        Route::get('/complaints', [StaffController::class, 'getComplaints']);
+        Route::post('/complaints/{id}/status', [StaffController::class, 'updateStatus']);
+        Route::post('/complaints/{id}/comment', [StaffController::class, 'addComment']);
     });
 });

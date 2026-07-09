@@ -1,29 +1,38 @@
 <nav class="navbar fade-in">
-    <a href="{{ route('dashboard') }}" class="navbar-brand">
+    <a href="{{ Auth::user()->role === 'staff' ? route('staff.dashboard') : route('dashboard') }}" class="navbar-brand">
         <i class="fas fa-headset"></i>
         <span>{{ setting('site_name', 'Smart Complaint System') }}</span>
     </a>
     
     <ul class="navbar-nav">
-        <li class="{{ Request::routeIs('dashboard') ? 'active' : '' }}">
-            <a href="{{ route('dashboard') }}"><i class="fas fa-home mr-1"></i> Dashboard</a>
-        </li>
-        <li class="{{ Request::routeIs('complaints.create') ? 'active' : '' }}">
-            <a href="{{ route('complaints.create') }}"><i class="fas fa-plus-circle mr-1"></i> Submit Complaint</a>
-        </li>
-        <li class="{{ Request::routeIs('complaints.index') ? 'active' : '' }}">
-            <a href="{{ route('complaints.index') }}"><i class="fas fa-list-alt mr-1"></i> My Complaints</a>
-        </li>
-        <li class="{{ Request::routeIs('announcements.index') || Request::routeIs('announcements.show') ? 'active' : '' }}">
-            <a href="/announcements"><i class="fas fa-bullhorn mr-1"></i> Announcements</a>
-        </li>
-        <li class="{{ Request::routeIs('profile') ? 'active' : '' }}">
-            <a href="{{ route('profile') }}"><i class="fas fa-user-cog mr-1"></i> Settings</a>
-        </li>
-        @if(Auth::user()->isAdmin())
-            <li>
-                <a href="{{ route('admin.dashboard') }}" class="btn btn-primary py-1 px-3 text-white" style="font-size: 0.85rem;"><i class="fas fa-shield-alt"></i> Admin Panel</a>
+        @if(Auth::user()->role === 'staff')
+            <li class="{{ Request::routeIs('staff.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('staff.dashboard') }}"><i class="fas fa-home mr-1"></i> Staff Dashboard</a>
             </li>
+            <li class="{{ Request::routeIs('profile') ? 'active' : '' }}">
+                <a href="{{ route('profile') }}"><i class="fas fa-user-cog mr-1"></i> Settings</a>
+            </li>
+        @else
+            <li class="{{ Request::routeIs('dashboard') ? 'active' : '' }}">
+                <a href="{{ route('dashboard') }}"><i class="fas fa-home mr-1"></i> Dashboard</a>
+            </li>
+            <li class="{{ Request::routeIs('complaints.create') ? 'active' : '' }}">
+                <a href="{{ route('complaints.create') }}"><i class="fas fa-plus-circle mr-1"></i> Submit Complaint</a>
+            </li>
+            <li class="{{ Request::routeIs('complaints.index') ? 'active' : '' }}">
+                <a href="{{ route('complaints.index') }}"><i class="fas fa-list-alt mr-1"></i> My Complaints</a>
+            </li>
+            <li class="{{ Request::routeIs('announcements.index') || Request::routeIs('announcements.show') ? 'active' : '' }}">
+                <a href="/announcements"><i class="fas fa-bullhorn mr-1"></i> Announcements</a>
+            </li>
+            <li class="{{ Request::routeIs('profile') ? 'active' : '' }}">
+                <a href="{{ route('profile') }}"><i class="fas fa-user-cog mr-1"></i> Settings</a>
+            </li>
+            @if(Auth::user()->isAdmin())
+                <li>
+                    <a href="{{ route('admin.dashboard') }}" class="btn btn-primary py-1 px-3 text-white" style="font-size: 0.85rem;"><i class="fas fa-shield-alt"></i> Admin Panel</a>
+                </li>
+            @endif
         @endif
     </ul>
 

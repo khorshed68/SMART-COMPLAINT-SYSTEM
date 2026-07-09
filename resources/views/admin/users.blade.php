@@ -16,6 +16,7 @@
                     <select id="filter-user-role" class="form-select" onchange="applyUserFilters()">
                         <option value="">All Roles</option>
                         <option value="user">User</option>
+                        <option value="staff">Staff</option>
                         <option value="admin">Admin</option>
                     </select>
                 </div>
