@@ -80,8 +80,13 @@
 
                 <div class="form-group">
                     <label for="complaint-location">Location / Area</label>
-                    <input type="text" id="complaint-location" name="location" class="form-control" placeholder="e.g. Hostel A Room 203, Central Library, CSE Seminar Room" required>
-                    <small class="text-muted mt-1.5 d-block"><i class="fas fa-map-marked-alt text-info mr-1"></i> Or click and drag the pin on the map below to pinpoint the exact location:</small>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="complaint-location" name="location" class="form-control" placeholder="e.g. Hostel A Room 203, Central Library, CSE Seminar Room" required style="flex-grow: 1;">
+                        <button type="button" class="btn btn-primary animate-hover" id="btn-search-location" style="flex-shrink: 0; padding: 12px 24px; font-weight: 600; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    <small class="text-muted mt-2 d-block"><i class="fas fa-map-marked-alt text-info mr-1"></i> Or click and drag the pin on the map below to pinpoint the exact location:</small>
                     <div id="map"></div>
                 </div>
 
@@ -205,6 +210,53 @@
             const lon = marker.getLatLng().lng;
             updateLocationFromMap(lat, lon);
         });
+
+        // Intercept Enter key inside the location input to search instead of submitting the form
+        $('#complaint-location').keydown(function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = $(this).val().trim();
+                if (query.length > 2) {
+                    searchLocationFromInput(query);
+                }
+            }
+        });
+
+        // Search button click handler
+        $('#btn-search-location').click(function() {
+            const query = $('#complaint-location').val().trim();
+            if (query.length > 2) {
+                searchLocationFromInput(query);
+            } else {
+                Toast.show('Please type a location name to search.', 'info');
+            }
+        });
+
+        // Forward geocoding function (Search location from name)
+        function searchLocationFromInput(query) {
+            // Query OSM Nominatim search API asynchronously (AJAX/Fetch)
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lon = parseFloat(data[0].lon);
+                        
+                        // Move marker and fly map to coordinates
+                        marker.setLatLng([lat, lon]);
+                        map.flyTo([lat, lon], 16);
+                        
+                        // Update input field value with the clean geocoded display name
+                        $('#complaint-location').val(data[0].display_name);
+                        Toast.show('Location pinned on map!', 'success');
+                    } else {
+                        Toast.show('Location not found. Try pinning manually on the map.', 'warning');
+                    }
+                })
+                .catch(err => {
+                    Toast.show('Could not search location. Pin manually.', 'error');
+                });
+        }
     });
 </script>
 @endsection

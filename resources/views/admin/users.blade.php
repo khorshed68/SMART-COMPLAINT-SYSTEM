@@ -24,6 +24,7 @@
                         <option value="">All Statuses</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
+                        <option value="pending">Pending</option>
                     </select>
                 </div>
                 <div class="col-md-6" style="padding: 5px 10px;">

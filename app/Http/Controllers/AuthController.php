@@ -87,11 +87,22 @@ class AuthController extends Controller
                 // Authentication passed
                 $user = Auth::user();
                 
-                if (!$user->isActive()) {
+                if ($user->status === 'pending') {
                     Auth::logout();
-                    return back()->withErrors([
-                        'email' => 'Your account is deactivated. Please contact support.',
-                    ])->withInput($request->only('email'));
+                    $msg = 'Your account is pending administrator approval.';
+                    if ($request->expectsJson()) {
+                        return response()->json(['success' => false, 'message' => $msg], 403);
+                    }
+                    return back()->withErrors(['email' => $msg])->withInput($request->only('email'));
+                }
+
+                if ($user->status === 'inactive') {
+                    Auth::logout();
+                    $msg = 'Your account has been deactivated. Please contact support.';
+                    if ($request->expectsJson()) {
+                        return response()->json(['success' => false, 'message' => $msg], 403);
+                    }
+                    return back()->withErrors(['email' => $msg])->withInput($request->only('email'));
                 }
 
                 // Reset login attempts
@@ -178,7 +189,7 @@ class AuthController extends Controller
             'phone' => $request->phone,
             'department' => $request->department,
             'role' => 'user',
-            'status' => 'active',
+            'status' => 'pending',
             'avatar' => $avatarPath,
         ]);
 
@@ -191,15 +202,17 @@ class AuthController extends Controller
             Log::error("Failed to send welcome email to {$user->email}: " . $e->getMessage());
         }
 
+        $regMessage = 'Registration successful! Your account is pending administrator approval.';
+
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Registration successful! Please login.',
+                'message' => $regMessage,
                 'redirect' => route('login')
             ]);
         }
 
-        return redirect()->route('login')->with('success', 'Registration successful! You can now log in.');
+        return redirect()->route('login')->with('success', $regMessage);
     }
 
     /**

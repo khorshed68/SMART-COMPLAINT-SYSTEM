@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('role', ['user', 'admin'])->default('user');
             $table->string('phone', 15)->nullable();
             $table->string('department', 100)->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('status', ['pending', 'active', 'inactive'])->default('pending');
             $table->string('avatar', 255)->nullable();
             $table->dateTime('last_login')->nullable();
             $table->integer('login_attempts')->default(0);

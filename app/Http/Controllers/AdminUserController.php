@@ -46,7 +46,7 @@ class AdminUserController extends Controller
     public function updateStatus(Request $request, int $id)
     {
         $request->validate([
-            'status' => 'required|in:active,inactive'
+            'status' => 'required|in:active,inactive,pending'
         ]);
 
         $user = User::findOrFail($id);

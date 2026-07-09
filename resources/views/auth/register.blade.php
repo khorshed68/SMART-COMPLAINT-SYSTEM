@@ -50,7 +50,7 @@
 
                 <div class="form-group">
                     <label for="reg-email">Email Address</label>
-                    <input type="email" id="reg-email" name="email" class="form-control" placeholder="john@example.com" required onkeyup="checkEmailAvailability(this.value, 'email-feedback')">
+                    <input type="email" id="reg-email" name="email" class="form-control" placeholder="john@example.com" required onkeyup="checkEmailAvailability(this.value, 'email-feedback')" readonly onfocus="this.removeAttribute('readonly');">
                     <div id="email-feedback" class="mt-2" style="font-size: 0.8rem;"></div>
                 </div>
 
@@ -73,7 +73,7 @@
                     <div class="col-md-6" style="padding: 0 8px;">
                         <div class="form-group">
                             <label for="reg-password">Password</label>
-                            <input type="password" id="reg-password" name="password" class="form-control" placeholder="••••••••" required onkeyup="checkPasswordStrength(this.value)">
+                            <input type="password" id="reg-password" name="password" class="form-control" placeholder="••••••••" required onkeyup="checkPasswordStrength(this.value)" readonly onfocus="this.removeAttribute('readonly');">
                             <div class="strength-meter">
                                 <div id="strength-bar" class="strength-bar"></div>
                             </div>
@@ -83,15 +83,9 @@
                     <div class="col-md-6" style="padding: 0 8px;">
                         <div class="form-group">
                             <label for="reg-confirm">Confirm Password</label>
-                            <input type="password" id="reg-confirm" name="password_confirmation" class="form-control" placeholder="••••••••" required>
+                            <input type="password" id="reg-confirm" name="password_confirmation" class="form-control" placeholder="••••••••" required readonly onfocus="this.removeAttribute('readonly');">
                         </div>
                     </div>
-                </div>
-
-                <div class="form-group mb-2">
-                    <label class="auth-checkbox-label">
-                        <input type="checkbox" required> I agree to the <a href="#" style="color: #705ecf; text-decoration: underline;">Terms & Conditions</a>
-                    </label>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 mt-3 py-3">Create Account</button>
@@ -137,5 +131,20 @@
             text.style.color = 'var(--secondary)';
         }
     }
+
+    $(document).ready(function() {
+        // Immediate profile picture size check on selection
+        $('#reg-avatar').change(function() {
+            if (this.files && this.files.length > 0) {
+                const file = this.files[0];
+                const maxSize = 2 * 1024 * 1024; // 2MB
+                if (file.size > maxSize) {
+                    // Clear the file selection
+                    $(this).val('');
+                    Toast.show('The selected picture size is too large. Please upload a smaller image (under 2MB).', 'warning');
+                }
+            }
+        });
+    });
 </script>
 @endsection

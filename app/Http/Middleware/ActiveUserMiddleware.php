@@ -15,18 +15,23 @@ class ActiveUserMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && !Auth::user()->isActive()) {
+            $status = Auth::user()->status;
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
+            $msg = $status === 'pending'
+                ? 'Your account is pending administrator approval.'
+                : 'Your account has been deactivated. Please contact support.';
+
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Your account is inactive. Please contact support.'
+                    'message' => $msg
                 ], Response::HTTP_FORBIDDEN);
             }
 
-            return redirect()->route('login')->with('error', 'Your account is deactivated. Please contact support.');
+            return redirect()->route('login')->with('error', $msg);
         }
 
         return $next($request);

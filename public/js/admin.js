@@ -283,20 +283,36 @@ function loadUsers(page = 1, filters = {}) {
         users.forEach(user => {
             const tr = document.createElement('tr');
             
-            let statusClass = user.status === 'active' ? 'btn-secondary' : 'btn-outline-primary';
-            let statusText = user.status === 'active' ? 'Deactivate' : 'Activate';
-            let statusToggle = user.status === 'active' ? 'inactive' : 'active';
+            let badgeColor = '#777';
+            if (user.status === 'active') badgeColor = '#2ecc71';
+            else if (user.status === 'pending') badgeColor = '#f39c12';
+
+            let actionButtons = '';
+            if (user.status === 'pending') {
+                actionButtons = `
+                    <button class="btn btn-sm btn-outline-success py-1 px-2 font-weight-bold" onclick="toggleUserStatus(${user.id}, 'active')" style="font-size: 0.75rem;">Approve</button>
+                    <button class="btn btn-sm btn-outline-secondary py-1 px-2" onclick="toggleUserStatus(${user.id}, 'inactive')" style="font-size: 0.75rem;">Reject</button>
+                `;
+            } else if (user.status === 'active') {
+                actionButtons = `
+                    <button class="btn btn-sm btn-secondary py-1 px-2" onclick="toggleUserStatus(${user.id}, 'inactive')" style="font-size: 0.75rem;">Deactivate</button>
+                `;
+            } else {
+                actionButtons = `
+                    <button class="btn btn-sm btn-outline-success py-1 px-2" onclick="toggleUserStatus(${user.id}, 'active')" style="font-size: 0.75rem;">Activate</button>
+                `;
+            }
 
             tr.innerHTML = `
                 <td><span class="font-weight-bold">#${user.id}</span></td>
                 <td>${user.name}</td>
                 <td>${user.email}</td>
                 <td><span class="badge" style="background-color: ${user.role === 'admin' ? '#e74c3c' : '#3498db'}">${user.role}</span></td>
-                <td><span class="badge" style="background-color: ${user.status === 'active' ? '#2ecc71' : '#777'}">${user.status}</span></td>
+                <td><span class="badge text-capitalize" style="background-color: ${badgeColor}">${user.status}</span></td>
                 <td>${user.department || 'N/A'}</td>
                 <td>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-sm ${statusClass} py-1 px-2" onclick="toggleUserStatus(${user.id}, '${statusToggle}')" style="font-size: 0.75rem;">${statusText}</button>
+                        ${actionButtons}
                         <button class="btn btn-sm btn-dark py-1 px-2" onclick="changeUserRoleModal(${user.id}, '${user.role}')" style="font-size: 0.75rem;">Role</button>
                         <button class="btn btn-sm btn-outline-danger py-1 px-2" onclick="deleteUser(${user.id})" style="font-size: 0.75rem;"><i class="fas fa-trash"></i></button>
                     </div>

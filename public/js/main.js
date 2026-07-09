@@ -122,6 +122,18 @@ function submitRegister(event) {
     const formData = new FormData(form);
     const submitBtn = $(form).find('button[type="submit"]');
 
+    // Client-side validation: Check profile picture size (Max: 2MB)
+    const avatarInput = form.querySelector('input[name="avatar"]');
+    if (avatarInput && avatarInput.files && avatarInput.files.length > 0) {
+        const file = avatarInput.files[0];
+        const maxSize = 2 * 1024 * 1024; // 2MB
+        if (file.size > maxSize) {
+            submitBtn.prop('disabled', false).text('Register');
+            Toast.show('Profile picture is too large. Max size is 2MB.', 'error');
+            return;
+        }
+    }
+
     submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating account...');
 
     $.ajax({
