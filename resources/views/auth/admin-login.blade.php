@@ -6,7 +6,7 @@
 <div class="auth-split-container fade-in">
     <div class="auth-split-card slide-up">
         <!-- Left Banner Panel -->
-        <div class="auth-split-visual" style="background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%);">
+        <div class="auth-split-visual" style="background-image: linear-gradient(135deg, rgba(30, 27, 75, 0.45) 0%, rgba(49, 16, 66, 0.45) 100%), url('{{ asset('images/login_banner.png') }}'); background-size: cover; background-position: center;">
             <div class="auth-visual-header">
                 <span class="auth-logo">SCS</span>
                 <a href="/" class="auth-back-link">Back to website &rarr;</a>
@@ -47,7 +47,7 @@
             <form action="{{ route('admin.login') }}" onsubmit="submitLogin(event)" autocomplete="off">
                 <div class="form-group">
                     <label for="login-email">Admin Email Address</label>
-                    <input type="email" id="login-email" name="email" class="form-control" placeholder="admin@example.com" required autofocus>
+                    <input type="email" id="login-email" name="email" class="form-control" placeholder="admin@example.com" required autofocus readonly onfocus="this.removeAttribute('readonly');">
                 </div>
                 
                 <div class="form-group">
@@ -55,7 +55,7 @@
                         <label for="login-password" style="margin-bottom: 0;">Password</label>
                     </div>
                     <div style="position: relative;">
-                        <input type="password" id="login-password" name="password" class="form-control" placeholder="••••••••" required style="padding-right: 45px;">
+                        <input type="password" id="login-password" name="password" class="form-control" placeholder="••••••••" required style="padding-right: 45px;" readonly onfocus="this.removeAttribute('readonly');">
                         <button type="button" onclick="const p = document.getElementById('login-password'); p.type = p.type === 'password' ? 'text' : 'password'; this.querySelector('i').classList.toggle('fa-eye-slash');" class="btn" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); border: none; background: transparent; padding: 5px 10px; color: #64748b; cursor: pointer;">
                             <i class="far fa-eye"></i>
                         </button>

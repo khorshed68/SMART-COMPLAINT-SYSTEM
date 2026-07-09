@@ -47,7 +47,7 @@
             <form onsubmit="submitLogin(event)" autocomplete="off">
                 <div class="form-group">
                     <label for="login-email">Email Address</label>
-                    <input type="email" id="login-email" name="email" class="form-control" placeholder="name@example.com" required autofocus>
+                    <input type="email" id="login-email" name="email" class="form-control" placeholder="name@example.com" required autofocus readonly onfocus="this.removeAttribute('readonly');">
                 </div>
                 
                 <div class="form-group">
@@ -55,7 +55,7 @@
                         <label for="login-password" style="margin-bottom: 0;">Password</label>
                     </div>
                     <div style="position: relative;">
-                        <input type="password" id="login-password" name="password" class="form-control" placeholder="••••••••" required style="padding-right: 45px;">
+                        <input type="password" id="login-password" name="password" class="form-control" placeholder="••••••••" required style="padding-right: 45px;" readonly onfocus="this.removeAttribute('readonly');">
                         <button type="button" onclick="const p = document.getElementById('login-password'); p.type = p.type === 'password' ? 'text' : 'password'; this.querySelector('i').classList.toggle('fa-eye-slash');" class="btn" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); border: none; background: transparent; padding: 5px 10px; color: #64748b; cursor: pointer;">
                             <i class="far fa-eye"></i>
                         </button>

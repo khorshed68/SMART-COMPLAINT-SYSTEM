@@ -2,6 +2,21 @@
 
 @section('title', 'Submit Complaint - ' . setting('site_name', 'Smart Complaint System'))
 
+@section('styles')
+<!-- Leaflet Map CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+    #map {
+        height: 250px;
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid var(--border-color, #cbd5e1);
+        margin-top: 10px;
+        z-index: 10;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="container fade-in" style="max-width: 800px;">
     <div class="card slide-up">
@@ -65,7 +80,9 @@
 
                 <div class="form-group">
                     <label for="complaint-location">Location / Area</label>
-                    <input type="text" id="complaint-location" name="location" class="form-control" placeholder="e.g. Hostel A Room 203, Central Library, CSE Seminar Room">
+                    <input type="text" id="complaint-location" name="location" class="form-control" placeholder="e.g. Hostel A Room 203, Central Library, CSE Seminar Room" required>
+                    <small class="text-muted mt-1.5 d-block"><i class="fas fa-map-marked-alt text-info mr-1"></i> Or click and drag the pin on the map below to pinpoint the exact location:</small>
+                    <div id="map"></div>
                 </div>
 
                 <div class="form-group">
@@ -96,6 +113,8 @@
 @endsection
 
 @section('scripts')
+<!-- Leaflet Map JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
     $(document).ready(function() {
         // Load categories dropdown
@@ -126,6 +145,65 @@
                     $('#active-outage-alert').addClass('d-none');
                 }
             });
+        });
+
+        // Initialize Leaflet Map centered on default campus coordinates
+        const defaultLat = 23.8103; // Default Dhaka coordinates
+        const defaultLon = 90.4125;
+        
+        const map = L.map('map').setView([defaultLat, defaultLon], 15);
+        
+        // Load OpenStreetMap tiles asynchronously
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // Add a draggable marker
+        let marker = L.marker([defaultLat, defaultLon], { draggable: true }).addTo(map);
+        
+        // Reverse-geocodes coordinate using OpenStreetMap Nominatim API
+        function updateLocationFromMap(lat, lon) {
+            // Set coordinate fallback instantly
+            $('#complaint-location').val(`Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`);
+            
+            // Query OSM Nominatim reverse API asynchronously (AJAX/Fetch)
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.display_name) {
+                        const addr = data.address;
+                        const shortAddr = [
+                            addr.suburb || addr.neighbourhood || addr.residential || '',
+                            addr.road || '',
+                            addr.city || addr.town || ''
+                        ].filter(Boolean).join(', ');
+                        
+                        if (shortAddr) {
+                            $('#complaint-location').val(`${shortAddr} (Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)})`);
+                        } else {
+                            $('#complaint-location').val(data.display_name);
+                        }
+                    }
+                })
+                .catch(err => {
+                    // Fail silently, fallback is already in place
+                });
+        }
+        
+        // Map click handler
+        map.on('click', function(e) {
+            const lat = e.latlng.lat;
+            const lon = e.latlng.lng;
+            marker.setLatLng([lat, lon]);
+            updateLocationFromMap(lat, lon);
+        });
+        
+        // Marker drag handler
+        marker.on('dragend', function() {
+            const lat = marker.getLatLng().lat;
+            const lon = marker.getLatLng().lng;
+            updateLocationFromMap(lat, lon);
         });
     });
 </script>

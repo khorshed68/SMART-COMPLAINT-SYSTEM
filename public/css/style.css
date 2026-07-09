@@ -702,15 +702,17 @@ body.dark-mode .rating-stars-select .star-btn.selected {
 .auth-split-container {
     display: flex;
     min-height: 100vh;
-    background-color: #09080e;
+    background-color: #0b0f19;
     background-image: 
-        radial-gradient(circle at 15% 20%, rgba(112, 94, 207, 0.14) 0%, transparent 45%),
-        radial-gradient(circle at 85% 80%, rgba(79, 70, 229, 0.15) 0%, transparent 45%),
-        radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.04) 0%, transparent 50%);
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(112, 94, 207, 0.14) 0%, transparent 60%);
+    background-size: 45px 45px, 45px 45px, 100% 100%;
     align-items: center;
     justify-content: center;
     padding: 20px;
     width: 100%;
+    transition: background-image 0.1s ease;
 }
 .auth-split-card {
     display: flex;
@@ -882,5 +884,27 @@ body.dark-mode .rating-stars-select .star-btn.selected {
     }
     .auth-split-form .auth-title {
         font-size: 1.8rem;
+    }
+}
+
+/* Water Wave Ripple Effect */
+.bg-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(112, 94, 207, 0.08) 0%, transparent 70%);
+    border: 1px solid rgba(112, 94, 207, 0.2);
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+    width: 25px;
+    height: 25px;
+    animation: ripple-wave 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    z-index: 1;
+}
+
+@keyframes ripple-wave {
+    to {
+        transform: translate(-50%, -50%) scale(10);
+        opacity: 0;
     }
 }
