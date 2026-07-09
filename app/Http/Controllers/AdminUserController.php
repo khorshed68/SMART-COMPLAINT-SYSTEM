@@ -6,6 +6,9 @@ use App\Models\User;
 use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\AccountApprovedMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class AdminUserController extends Controller
 {
@@ -62,6 +65,17 @@ class AdminUserController extends Controller
         $oldValues = $user->toArray();
         $user->status = $request->status;
         $user->save();
+
+        // Send email notification on account approval
+        if ($request->status === 'active' && $oldValues['status'] === 'pending') {
+            try {
+                if (setting('enable_email_notifications', '1') === '1') {
+                    Mail::to($user->email)->send(new AccountApprovedMail($user));
+                }
+            } catch (\Exception $e) {
+                Log::error("Failed to send account approval email to {$user->email}: " . $e->getMessage());
+            }
+        }
 
         AuditService::log(
             Auth::id(),

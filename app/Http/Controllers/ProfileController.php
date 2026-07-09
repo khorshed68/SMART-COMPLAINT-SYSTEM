@@ -10,6 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\ProfileUpdatedMail;
+use App\Mail\PasswordChangedMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -41,6 +45,15 @@ class ProfileController extends Controller
         $oldValues = $user->toArray();
 
         $user->update($request->validated());
+
+        // Send email notification on profile update
+        try {
+            if (setting('enable_email_notifications', '1') === '1') {
+                Mail::to($user->email)->send(new ProfileUpdatedMail($user));
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to send profile update email to {$user->email}: " . $e->getMessage());
+        }
 
         AuditService::log(
             $user->id,
@@ -76,6 +89,15 @@ class ProfileController extends Controller
         $oldValues = ['password' => '[HIDDEN]'];
         $user->password = Hash::make($request->new_password);
         $user->save();
+
+        // Send email notification on password change
+        try {
+            if (setting('enable_email_notifications', '1') === '1') {
+                Mail::to($user->email)->send(new PasswordChangedMail($user));
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to send password change email to {$user->email}: " . $e->getMessage());
+        }
 
         AuditService::log(
             $user->id,
