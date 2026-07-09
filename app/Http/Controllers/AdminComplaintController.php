@@ -9,10 +9,11 @@ use App\Services\ComplaintService;
 use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class AdminComplaintController extends Controller
 {
-    protected $complaintService;
+    protected ComplaintService $complaintService;
 
     public function __construct(ComplaintService $complaintService)
     {

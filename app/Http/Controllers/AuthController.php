@@ -20,7 +20,9 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         if (Auth::check()) {
-            return Auth::user()->isAdmin()
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            return $user->isAdmin()
                 ? redirect()->route('admin.dashboard')
                 : redirect()->route('dashboard');
         }
@@ -33,7 +35,9 @@ class AuthController extends Controller
     public function showAdminLoginForm()
     {
         if (Auth::check()) {
-            return Auth::user()->isAdmin()
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            return $user->isAdmin()
                 ? redirect()->route('admin.dashboard')
                 : redirect()->route('dashboard');
         }
@@ -85,6 +89,7 @@ class AuthController extends Controller
 
             if (Auth::attempt($credentials)) {
                 // Authentication passed
+                /** @var \App\Models\User $user */
                 $user = Auth::user();
                 
                 if ($user->status === 'pending') {
@@ -165,7 +170,9 @@ class AuthController extends Controller
     public function showRegistrationForm()
     {
         if (Auth::check()) {
-            return Auth::user()->isAdmin()
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            return $user->isAdmin()
                 ? redirect()->route('admin.dashboard')
                 : redirect()->route('dashboard');
         }

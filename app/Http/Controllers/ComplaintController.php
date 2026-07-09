@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ComplaintController extends Controller
 {
-    protected $complaintService;
+    protected ComplaintService $complaintService;
 
     public function __construct(ComplaintService $complaintService)
     {
@@ -86,7 +86,9 @@ class ComplaintController extends Controller
         $complaint = Complaint::with(['category', 'assignee', 'user'])->findOrFail($id);
 
         // Security check: Only owner or admin can view
-        if ($complaint->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        if ($complaint->user_id !== Auth::id() && !$user->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -98,9 +100,11 @@ class ComplaintController extends Controller
      */
     public function getComplaints(Request $request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         
         // Admins can query all complaints; standard users only query their own
+        /** @var \Illuminate\Database\Eloquent\Builder|\App\Models\Complaint $query */
         $query = $user->isAdmin() 
             ? Complaint::with(['user', 'category', 'assignee']) 
             : Complaint::byUser($user->id)->with(['category', 'assignee']);
@@ -132,7 +136,9 @@ class ComplaintController extends Controller
     {
         $complaint = Complaint::with(['user', 'category', 'assignee'])->findOrFail($id);
 
-        if ($complaint->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        if ($complaint->user_id !== Auth::id() && !$user->isAdmin()) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
@@ -151,7 +157,9 @@ class ComplaintController extends Controller
     {
         $complaint = Complaint::findOrFail($id);
 
-        if ($complaint->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        if ($complaint->user_id !== Auth::id() && !$user->isAdmin()) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 

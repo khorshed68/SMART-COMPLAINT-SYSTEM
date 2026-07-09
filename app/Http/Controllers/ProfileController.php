@@ -26,6 +26,7 @@ class ProfileController extends Controller
      */
     public function getProfile()
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         return response()->json($user);
     }
@@ -35,6 +36,7 @@ class ProfileController extends Controller
      */
     public function update(UpdateProfileRequest $request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         $oldValues = $user->toArray();
 
@@ -61,6 +63,7 @@ class ProfileController extends Controller
      */
     public function changePassword(ChangePasswordRequest $request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         if (!Hash::check($request->current_password, $user->password)) {
@@ -98,6 +101,7 @@ class ProfileController extends Controller
             'avatar' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048'
         ]);
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         $oldValues = $user->toArray();
 
