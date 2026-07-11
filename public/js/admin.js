@@ -303,15 +303,10 @@ function loadUsers(page = 1, filters = {}) {
                 `;
             }
 
-            let roleColor = '#3498db';
-            if (user.role === 'admin') roleColor = '#e74c3c';
-            else if (user.role === 'staff') roleColor = '#8b5cf6';
-
             tr.innerHTML = `
                 <td><span class="font-weight-bold">#${user.id}</span></td>
                 <td>${user.name}</td>
                 <td>${user.email}</td>
-                <td><span class="badge" style="background-color: ${roleColor}">${user.role}</span></td>
                 <td><span class="badge text-capitalize" style="background-color: ${badgeColor}">${user.status}</span></td>
                 <td>${user.department || 'N/A'}</td>
                 <td>

@@ -12,15 +12,7 @@
     <div class="card mb-4">
         <div class="card-body p-3">
             <form id="users-filters-form" onsubmit="event.preventDefault(); applyUserFilters();" class="row align-items-center">
-                <div class="col-md-3" style="padding: 5px 10px;">
-                    <select id="filter-user-role" class="form-select" onchange="applyUserFilters()">
-                        <option value="">All Roles</option>
-                        <option value="user">User</option>
-                        <option value="staff">Staff</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-                <div class="col-md-3" style="padding: 5px 10px;">
+                <div class="col-md-4" style="padding: 5px 10px;">
                     <select id="filter-user-status" class="form-select" onchange="applyUserFilters()">
                         <option value="">All Statuses</option>
                         <option value="active">Active</option>
@@ -28,7 +20,7 @@
                         <option value="pending">Pending</option>
                     </select>
                 </div>
-                <div class="col-md-6" style="padding: 5px 10px;">
+                <div class="col-md-8" style="padding: 5px 10px;">
                     <div style="position: relative;">
                         <input type="text" id="filter-user-search" class="form-control" placeholder="Search by name or email..." style="padding-right: 40px;" onkeyup="debounce(applyUserFilters, 400)()">
                         <i class="fas fa-search text-muted" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);"></i>
@@ -48,7 +40,6 @@
                             <th>ID</th>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Role</th>
                             <th>Status</th>
                             <th>Department</th>
                             <th>Actions</th>
@@ -71,7 +62,6 @@
 <script>
     function applyUserFilters() {
         const filters = {
-            role: document.getElementById('filter-user-role').value,
             status: document.getElementById('filter-user-status').value,
             search: document.getElementById('filter-user-search').value
         };

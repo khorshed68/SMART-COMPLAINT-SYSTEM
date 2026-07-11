@@ -25,11 +25,7 @@ class AdminUserController extends Controller
      */
     public function getUsers(Request $request)
     {
-        $query = User::query();
-
-        if ($request->filled('role')) {
-            $query->where('role', $request->role);
-        }
+        $query = User::where('role', 'user');
         
         if ($request->filled('status')) {
             $query->where('status', $request->status);
