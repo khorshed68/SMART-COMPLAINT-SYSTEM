@@ -84,6 +84,7 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/complaints', [AdminComplaintController::class, 'index'])->name('complaints');
         Route::get('/complaints/{id}', [AdminComplaintController::class, 'show'])->name('complaints.show');
         Route::get('/users', [AdminUserController::class, 'index'])->name('users');
+        Route::get('/staff', [AdminUserController::class, 'staffIndex'])->name('staff');
         Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories');
         Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
         Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings');
@@ -111,6 +112,10 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::put('/users/{id}/status', [AdminUserController::class, 'updateStatus']);
         Route::put('/users/{id}/role', [AdminUserController::class, 'updateRole']);
         Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
+
+        // Staff Management API
+        Route::get('/staff-list', [AdminUserController::class, 'getStaffList']);
+        Route::post('/staff', [AdminUserController::class, 'createStaff']);
 
         // Category Operations
         Route::get('/categories', [AdminCategoryController::class, 'getCategories']);

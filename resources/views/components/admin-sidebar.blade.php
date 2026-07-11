@@ -14,6 +14,9 @@
         <li class="sidebar-menu-item {{ Request::routeIs('admin.users') ? 'active' : '' }}">
             <a href="{{ route('admin.users') }}"><i class="fas fa-users"></i> Users</a>
         </li>
+        <li class="sidebar-menu-item {{ Request::routeIs('admin.staff') ? 'active' : '' }}">
+            <a href="{{ route('admin.staff') }}"><i class="fas fa-tools"></i> Staff</a>
+        </li>
         <li class="sidebar-menu-item {{ Request::routeIs('admin.categories') ? 'active' : '' }}">
             <a href="{{ route('admin.categories') }}"><i class="fas fa-folder-open"></i> Categories</a>
         </li>

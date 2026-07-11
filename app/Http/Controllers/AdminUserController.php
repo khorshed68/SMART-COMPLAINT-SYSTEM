@@ -163,4 +163,83 @@ class AdminUserController extends Controller
             'message' => 'User deleted successfully.'
         ]);
     }
+
+    /**
+     * Display staff management view.
+     */
+    public function staffIndex()
+    {
+        return view('admin.staff');
+    }
+
+    /**
+     * AJAX: Get paginated staff list with active complaints count.
+     */
+    public function getStaffList(Request $request)
+    {
+        $query = User::where('role', 'staff')
+            ->withCount(['assignedComplaints' => function($q) {
+                $q->whereIn('status', ['Pending', 'In Progress']);
+            }]);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $query->search($request->search);
+        }
+
+        $staff = $query->orderBy('created_at', 'desc')->paginate(10);
+        return response()->json($staff);
+    }
+
+    /**
+     * AJAX: Create new staff user directly by admin.
+     */
+    public function createStaff(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|min:2|max:100',
+            'email' => 'required|email|max:100|unique:users,email',
+            'password' => 'required|string|min:6',
+            'phone' => 'required|string|max:15',
+            'department' => 'required|string|max:100',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'phone' => $request->phone,
+            'department' => $request->department,
+            'role' => 'staff',
+            'status' => 'active',
+        ]);
+
+        // Send Welcome Email
+        try {
+            if (setting('enable_email_notifications', '1') === '1') {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\WelcomeEmail($user));
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Failed to send welcome email to created staff {$user->email}: " . $e->getMessage());
+        }
+
+        // Audit Log
+        AuditService::log(
+            Auth::id(),
+            'create_staff',
+            'User',
+            $user->id,
+            null,
+            $user->toArray()
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Staff member created successfully.',
+            'user' => $user
+        ]);
+    }
 }
