@@ -3,14 +3,14 @@
 @section('title', 'System Health - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
-<div class="fade-in">
-    <h1 class="dashboard-section-title mb-4"><i class="fas fa-heartbeat"></i> System Diagnostics</h1>
+<div class="fade-in-up">
+    <h1 class="dashboard-section-title mb-4"><i class="fas fa-heartbeat text-primary mr-2"></i> System Diagnostics</h1>
 
     <div class="row">
         <!-- Parameters and allocation -->
         <div class="col-md-6">
-            <div class="card mb-4" id="system-health-container">
-                <div class="card-header">Server Environment</div>
+            <div class="card mb-4 border-0 shadow-sm rounded-4" id="system-health-container">
+                <div class="card-header bg-transparent border-0 py-4"><h5 class="font-weight-bold mb-0">Server Environment</h5></div>
                 <div class="card-body">
                     <table class="table" style="border: 0;">
                         <tbody>
@@ -42,8 +42,8 @@
 
         <!-- Allocation progress bars -->
         <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header">Resource Allocations</div>
+            <div class="card mb-4 border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 py-4"><h5 class="font-weight-bold mb-0">Resource Allocations</h5></div>
                 <div class="card-body">
                     <!-- Disk Allocation -->
                     <div class="mb-4">
@@ -72,19 +72,19 @@
     </div>
 
     <!-- Audit logs table -->
-    <div class="card">
-        <div class="card-header">Recent Audit Logs</div>
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-transparent border-0 py-4"><h5 class="font-weight-bold mb-0">Recent Audit Logs</h5></div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-striped">
+                <table class="table mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Responsible User</th>
-                            <th>Action Actioned</th>
-                            <th>Target Entity</th>
-                            <th>IP Address</th>
-                            <th>Date Occurred</th>
+                            <th class="border-top-0">ID</th>
+                            <th class="border-top-0">Responsible User</th>
+                            <th class="border-top-0">Action Actioned</th>
+                            <th class="border-top-0">Target Entity</th>
+                            <th class="border-top-0">IP Address</th>
+                            <th class="border-top-0">Date Occurred</th>
                         </tr>
                     </thead>
                     <tbody id="audit-logs-table-body">

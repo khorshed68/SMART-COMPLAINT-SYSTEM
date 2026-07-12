@@ -3,10 +3,10 @@
 @section('title', 'Change Password - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
-<div class="fade-in" style="max-width: 600px; margin: 0 auto;">
-    <h1 class="dashboard-section-title mb-4"><i class="fas fa-key"></i> Change Admin Password</h1>
+<div class="fade-in-up" style="max-width: 600px; margin: 0 auto;">
+    <h1 class="dashboard-section-title mb-4"><i class="fas fa-key text-primary mr-2"></i> Change Admin Password</h1>
 
-    <div class="card">
+    <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body">
             <form id="admin-password-form" onsubmit="changeAdminPassword(event)">
                 <div class="form-group">
@@ -29,7 +29,7 @@
                 </div>
 
                 <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">Update Password</button>
+                    <button type="submit" class="btn btn-primary font-weight-bold" style="border-radius: 8px; padding: 10px 25px;"><i class="fas fa-lock mr-2"></i> Update Password</button>
                 </div>
             </form>
         </div>

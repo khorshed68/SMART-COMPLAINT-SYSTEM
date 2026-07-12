@@ -3,18 +3,18 @@
 @section('title', 'Manage Staff - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
-<div class="fade-in">
-    <div class="dashboard-section-header mb-4">
-        <h1 class="dashboard-section-title"><i class="fas fa-tools"></i> Staff Management</h1>
-        <button onclick="openAddStaffModal()" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add Staff Member</button>
+<div class="fade-in-up">
+    <div class="dashboard-section-header mb-4 d-flex justify-content-between align-items-center">
+        <h1 class="dashboard-section-title mb-0"><i class="fas fa-tools text-primary mr-2"></i> Staff Management</h1>
+        <button onclick="openAddStaffModal()" class="btn btn-primary font-weight-bold" style="border-radius: 8px; padding: 10px 20px;"><i class="fas fa-plus mr-2"></i> Add Staff Member</button>
     </div>
 
     <!-- Filters Row -->
-    <div class="card mb-4">
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
         <div class="card-body p-3">
             <form id="staff-filters-form" onsubmit="event.preventDefault(); applyStaffFilters();" class="row align-items-center">
                 <div class="col-md-3" style="padding: 5px 10px;">
-                    <select id="filter-staff-status" class="form-select" onchange="applyStaffFilters()">
+                    <select id="filter-staff-status" class="form-select border-0 bg-light" onchange="applyStaffFilters()">
                         <option value="">All Statuses</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
@@ -23,7 +23,7 @@
                 </div>
                 <div class="col-md-9" style="padding: 5px 10px;">
                     <div style="position: relative;">
-                        <input type="text" id="filter-staff-search" class="form-control" placeholder="Search by name, email, or department specialty..." style="padding-right: 40px;" onkeyup="debounce(applyStaffFilters, 400)()">
+                        <input type="text" id="filter-staff-search" class="form-control border-0 bg-light" placeholder="Search by name, email, or department specialty..." style="padding-right: 40px;" onkeyup="debounce(applyStaffFilters, 400)()">
                         <i class="fas fa-search text-muted" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);"></i>
                     </div>
                 </div>
@@ -32,10 +32,10 @@
     </div>
 
     <!-- Table -->
-    <div class="card">
+    <div class="card border-0 shadow-none bg-transparent">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-striped">
+                <table class="table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -90,9 +90,9 @@
             staffMembers.forEach(staff => {
                 const tr = document.createElement('tr');
                 
-                let badgeColor = '#777';
-                if (staff.status === 'active') badgeColor = '#2ecc71';
-                else if (staff.status === 'pending') badgeColor = '#f39c12';
+                let badgeClass = 'badge-inactive';
+                if (staff.status === 'active') badgeClass = 'badge-active';
+                else if (staff.status === 'pending') badgeClass = 'badge-pending';
 
                 const activeTickets = staff.assigned_complaints_count || 0;
                 const ticketBadgeColor = activeTickets > 0 ? '#ef4444' : '#10b981';
@@ -100,37 +100,44 @@
                 let actionButtons = '';
                 if (staff.status === 'pending') {
                     actionButtons = `
-                        <button class="btn btn-sm btn-outline-success py-1 px-2 font-weight-bold" onclick="toggleStaffStatus(${staff.id}, 'active')" style="font-size: 0.75rem;">Approve</button>
-                        <button class="btn btn-sm btn-outline-secondary py-1 px-2" onclick="toggleStaffStatus(${staff.id}, 'inactive')" style="font-size: 0.75rem;">Reject</button>
+                        <button class="btn-action" title="Approve" onclick="toggleStaffStatus(${staff.id}, 'active')"><i class="fas fa-check text-success"></i></button>
+                        <button class="btn-action" title="Reject" onclick="toggleStaffStatus(${staff.id}, 'inactive')"><i class="fas fa-times text-danger"></i></button>
                     `;
                 } else if (staff.status === 'active') {
                     actionButtons = `
-                        <button class="btn btn-sm btn-secondary py-1 px-2" onclick="toggleStaffStatus(${staff.id}, 'inactive')" style="font-size: 0.75rem;">Deactivate</button>
+                        <button class="btn-action" title="Deactivate" onclick="toggleStaffStatus(${staff.id}, 'inactive')"><i class="fas fa-ban text-warning"></i></button>
                     `;
                 } else {
                     actionButtons = `
-                        <button class="btn btn-sm btn-outline-success py-1 px-2" onclick="toggleStaffStatus(${staff.id}, 'active')" style="font-size: 0.75rem;">Activate</button>
+                        <button class="btn-action" title="Activate" onclick="toggleStaffStatus(${staff.id}, 'active')"><i class="fas fa-check text-success"></i></button>
                     `;
                 }
 
                 tr.innerHTML = `
-                    <td><span class="font-weight-bold">#${staff.id}</span></td>
-                    <td>${staff.name}</td>
+                    <td><span class="font-weight-bold text-primary">#${staff.id}</span></td>
                     <td>
-                        <div style="font-size: 0.9rem; font-weight: 500;">${staff.email}</div>
-                        <div class="text-muted" style="font-size: 0.78rem;">${staff.phone || 'No Phone Record'}</div>
+                        <div class="d-flex align-items-center">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); color: var(--secondary); display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 12px; font-size: 0.85rem;">
+                                ${staff.name.charAt(0).toUpperCase()}
+                            </div>
+                            <span class="font-weight-bold">${staff.name}</span>
+                        </div>
                     </td>
-                    <td><span class="badge" style="background-color: var(--secondary);">${staff.department || 'Other'}</span></td>
                     <td>
-                        <span class="badge text-white" style="background-color: ${ticketBadgeColor}; font-size: 0.78rem; padding: 4px 8px; border-radius: 20px;">
+                        <div style="font-size: 0.9rem; font-weight: 500;"><a href="mailto:${staff.email}" style="color: inherit; text-decoration: none;"><i class="far fa-envelope text-muted mr-1"></i> ${staff.email}</a></div>
+                        <div class="text-muted" style="font-size: 0.78rem;"><i class="fas fa-phone-alt text-muted mr-1"></i> ${staff.phone || 'No Phone Record'}</div>
+                    </td>
+                    <td><span class="badge" style="background-color: rgba(16, 185, 129, 0.1); color: var(--secondary);">${staff.department || 'Other'}</span></td>
+                    <td>
+                        <span class="badge text-white" style="background-color: ${ticketBadgeColor}; font-size: 0.75rem;">
                             ${activeTickets} Active
                         </span>
                     </td>
-                    <td><span class="badge text-capitalize" style="background-color: ${badgeColor}">${staff.status}</span></td>
+                    <td><span class="badge ${badgeClass}">${staff.status}</span></td>
                     <td>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex">
                             ${actionButtons}
-                            <button class="btn btn-sm btn-outline-danger py-1 px-2" onclick="deleteStaff(${staff.id})" style="font-size: 0.75rem;"><i class="fas fa-trash"></i></button>
+                            <button class="btn-action delete" title="Delete Staff" onclick="deleteStaff(${staff.id})"><i class="fas fa-trash"></i></button>
                         </div>
                     </td>
                 `;

@@ -3,21 +3,21 @@
 @section('title', 'Manage Complaints - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
-<div class="fade-in">
-    <div class="dashboard-section-header mb-4">
-        <h1 class="dashboard-section-title"><i class="fas fa-ticket-alt"></i> Complaints Management</h1>
+<div class="fade-in-up">
+    <div class="dashboard-section-header mb-4 d-flex justify-content-between align-items-center">
+        <h1 class="dashboard-section-title mb-0"><i class="fas fa-ticket-alt text-primary mr-2"></i> Complaints Management</h1>
         <div class="d-flex gap-2">
-            <button onclick="exportData('csv')" class="btn btn-outline-primary btn-sm"><i class="fas fa-file-csv"></i> Export CSV</button>
-            <button onclick="exportData('json')" class="btn btn-dark btn-sm"><i class="fas fa-file-code"></i> Export JSON</button>
+            <button onclick="exportData('csv')" class="btn btn-outline-primary font-weight-bold" style="border-radius: 8px;"><i class="fas fa-file-csv mr-1"></i> Export CSV</button>
+            <button onclick="exportData('json')" class="btn btn-dark font-weight-bold" style="border-radius: 8px;"><i class="fas fa-file-code mr-1"></i> Export JSON</button>
         </div>
     </div>
 
     <!-- Filters -->
-    <div class="card mb-4">
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
         <div class="card-body p-3">
             <form id="admin-filters-form" onsubmit="event.preventDefault(); applyAdminFilters();" class="row align-items-center">
                 <div class="col-md-3" style="padding: 5px 10px;">
-                    <select id="filter-status" class="form-select" onchange="applyAdminFilters()">
+                    <select id="filter-status" class="form-select border-0 bg-light" onchange="applyAdminFilters()">
                         <option value="">All Statuses</option>
                         <option value="Pending">Pending</option>
                         <option value="In Progress">In Progress</option>
@@ -26,7 +26,7 @@
                     </select>
                 </div>
                 <div class="col-md-3" style="padding: 5px 10px;">
-                    <select id="filter-priority" class="form-select" onchange="applyAdminFilters()">
+                    <select id="filter-priority" class="form-select border-0 bg-light" onchange="applyAdminFilters()">
                         <option value="">All Priorities</option>
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
@@ -34,13 +34,13 @@
                     </select>
                 </div>
                 <div class="col-md-3" style="padding: 5px 10px;">
-                    <select id="filter-category" class="form-select" onchange="applyAdminFilters()">
+                    <select id="filter-category" class="form-select border-0 bg-light" onchange="applyAdminFilters()">
                         <option value="">All Categories</option>
                     </select>
                 </div>
                 <div class="col-md-3" style="padding: 5px 10px;">
                     <div style="position: relative;">
-                        <input type="text" id="filter-search" class="form-control" placeholder="Search title or user..." style="padding-right: 40px;" onkeyup="debounce(applyAdminFilters, 400)()">
+                        <input type="text" id="filter-search" class="form-control border-0 bg-light" placeholder="Search title or user..." style="padding-right: 40px;" onkeyup="debounce(applyAdminFilters, 400)()">
                         <i class="fas fa-search text-muted" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);"></i>
                     </div>
                 </div>
@@ -49,10 +49,10 @@
     </div>
 
     <!-- Table Card -->
-    <div class="card">
+    <div class="card border-0 shadow-none bg-transparent">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-striped">
+                <table class="table">
                     <thead>
                         <tr>
                             <th>ID</th>

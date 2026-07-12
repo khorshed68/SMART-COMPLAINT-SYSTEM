@@ -3,7 +3,7 @@
 @section('title', 'System Analytics - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
-<div class="fade-in">
+<div class="fade-in-up">
     <div class="dashboard-section-header mb-4">
         <h1 class="dashboard-section-title"><i class="fas fa-chart-pie"></i> Analytics Dashboard</h1>
     </div>
@@ -75,16 +75,16 @@
         </div>
         <!-- Category Satisfaction Ratings Table -->
         <div class="col-md-6 mb-4">
-            <div class="card h-100 mb-0">
-                <div class="card-header"><i class="fas fa-tags mr-2 text-primary"></i> Category Satisfaction Scores</div>
+            <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
+                <div class="card-header bg-transparent border-0 py-4"><h5 class="font-weight-bold mb-0"><i class="fas fa-tags mr-2 text-primary"></i> Category Satisfaction Scores</h5></div>
                 <div class="card-body p-0" style="max-height: 295px; overflow-y: auto;">
                     <div class="table-responsive">
-                        <table class="table table-hover table-striped mb-0">
+                        <table class="table mb-0">
                             <thead>
                                 <tr>
-                                    <th>Category</th>
-                                    <th>Total Rated</th>
-                                    <th>Average Satisfaction</th>
+                                    <th class="border-top-0">Category</th>
+                                    <th class="border-top-0">Total Rated</th>
+                                    <th class="border-top-0">Average Satisfaction</th>
                                 </tr>
                             </thead>
                             <tbody id="category-satisfaction-body">
@@ -100,19 +100,19 @@
     </div>
 
     <!-- Assignee performance list -->
-    <div class="card mt-2">
-        <div class="card-header">Administrator Performance Matrix</div>
+    <div class="card border-0 shadow-sm rounded-4 mt-2 mb-5">
+        <div class="card-header bg-transparent border-0 py-4"><h5 class="font-weight-bold mb-0">Administrator Performance Matrix</h5></div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-striped mb-0">
+                <table class="table mb-0">
                     <thead>
                         <tr>
-                            <th>Admin Name</th>
-                            <th>Assigned Complaints</th>
-                            <th>Resolved Complaints</th>
-                            <th>Avg Resolution Hours</th>
-                            <th>Resolution Success Rate</th>
-                            <th>Customer Rating</th>
+                            <th class="border-top-0">Admin Name</th>
+                            <th class="border-top-0">Assigned Complaints</th>
+                            <th class="border-top-0">Resolved Complaints</th>
+                            <th class="border-top-0">Avg Resolution Hours</th>
+                            <th class="border-top-0">Resolution Success Rate</th>
+                            <th class="border-top-0">Customer Rating</th>
                         </tr>
                     </thead>
                     <tbody id="assignee-performance-body">

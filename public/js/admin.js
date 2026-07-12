@@ -182,24 +182,16 @@ function loadAdminComplaints(page = 1, filters = {}) {
                 <td>${item.assignee ? item.assignee.name : '<span class="text-muted">Unassigned</span>'}</td>
                 <td>${formatDate(item.created_at)}</td>
                 <td>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-primary btn-sm py-1 px-2" onclick="$(this).next('.dropdown-menu').toggleClass('show'); event.stopPropagation();">
-                            Actions <i class="fas fa-chevron-down" style="font-size: 0.7rem;"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="/admin/complaints/${item.id}"><i class="fas fa-eye mr-2"></i> View Panel</a>
-                            <button class="dropdown-item text-danger" onclick="deleteComplaint(${item.id})"><i class="fas fa-trash mr-2"></i> Delete</button>
-                        </div>
+                    <div class="d-flex">
+                        <a class="btn-action" href="/admin/complaints/${item.id}" title="View Panel"><i class="fas fa-eye text-primary"></i></a>
+                        <button class="btn-action delete" title="Delete" onclick="deleteComplaint(${item.id})"><i class="fas fa-trash"></i></button>
                     </div>
                 </td>
             `;
             container.appendChild(tr);
         });
 
-        // Close dropdowns on click outside
-        document.addEventListener('click', () => {
-            $('.dropdown-menu').removeClass('show');
-        });
+
 
         Pagination.render(response, 'admin-complaints-pagination', (pageNum) => {
             loadAdminComplaints(pageNum, currentAdminFilters);
@@ -283,37 +275,37 @@ function loadUsers(page = 1, filters = {}) {
         users.forEach(user => {
             const tr = document.createElement('tr');
             
-            let badgeColor = '#777';
-            if (user.status === 'active') badgeColor = '#2ecc71';
-            else if (user.status === 'pending') badgeColor = '#f39c12';
+            let badgeClass = 'badge-inactive';
+            if (user.status === 'active') badgeClass = 'badge-active';
+            else if (user.status === 'pending') badgeClass = 'badge-pending';
 
             let actionButtons = '';
             if (user.status === 'pending') {
                 actionButtons = `
-                    <button class="btn btn-sm btn-outline-success py-1 px-2 font-weight-bold" onclick="toggleUserStatus(${user.id}, 'active')" style="font-size: 0.75rem;">Approve</button>
-                    <button class="btn btn-sm btn-outline-secondary py-1 px-2" onclick="toggleUserStatus(${user.id}, 'inactive')" style="font-size: 0.75rem;">Reject</button>
+                    <button class="btn-action" title="Approve" onclick="toggleUserStatus(${user.id}, 'active')"><i class="fas fa-check text-success"></i></button>
+                    <button class="btn-action" title="Reject" onclick="toggleUserStatus(${user.id}, 'inactive')"><i class="fas fa-times text-danger"></i></button>
                 `;
             } else if (user.status === 'active') {
                 actionButtons = `
-                    <button class="btn btn-sm btn-secondary py-1 px-2" onclick="toggleUserStatus(${user.id}, 'inactive')" style="font-size: 0.75rem;">Deactivate</button>
+                    <button class="btn-action" title="Deactivate" onclick="toggleUserStatus(${user.id}, 'inactive')"><i class="fas fa-ban text-warning"></i></button>
                 `;
             } else {
                 actionButtons = `
-                    <button class="btn btn-sm btn-outline-success py-1 px-2" onclick="toggleUserStatus(${user.id}, 'active')" style="font-size: 0.75rem;">Activate</button>
+                    <button class="btn-action" title="Activate" onclick="toggleUserStatus(${user.id}, 'active')"><i class="fas fa-check text-success"></i></button>
                 `;
             }
 
             tr.innerHTML = `
-                <td><span class="font-weight-bold">#${user.id}</span></td>
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td><span class="badge text-capitalize" style="background-color: ${badgeColor}">${user.status}</span></td>
-                <td>${user.department || 'N/A'}</td>
+                <td><span class="font-weight-bold text-primary">#${user.id}</span></td>
+                <td><div class="d-flex align-items-center"><div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 12px; font-size: 0.85rem;">${user.name.charAt(0).toUpperCase()}</div><span class="font-weight-bold">${user.name}</span></div></td>
+                <td><a href="mailto:${user.email}" style="color: inherit; text-decoration: none;"><i class="far fa-envelope text-muted mr-1"></i> ${user.email}</a></td>
+                <td><span class="badge ${badgeClass}">${user.status}</span></td>
+                <td>${user.department || '<span class="text-muted">N/A</span>'}</td>
                 <td>
-                    <div class="d-flex gap-2">
+                    <div class="d-flex">
                         ${actionButtons}
-                        <button class="btn btn-sm btn-dark py-1 px-2" onclick="changeUserRoleModal(${user.id}, '${user.role}')" style="font-size: 0.75rem;">Role</button>
-                        <button class="btn btn-sm btn-outline-danger py-1 px-2" onclick="deleteUser(${user.id})" style="font-size: 0.75rem;"><i class="fas fa-trash"></i></button>
+                        <button class="btn-action" title="Change Role" onclick="changeUserRoleModal(${user.id}, '${user.role}')"><i class="fas fa-user-shield text-info"></i></button>
+                        <button class="btn-action delete" title="Delete User" onclick="deleteUser(${user.id})"><i class="fas fa-trash"></i></button>
                     </div>
                 </td>
             `;
@@ -418,8 +410,8 @@ function loadAdminCategories() {
                         <p class="text-muted mb-3" style="font-size: 0.82rem; height: 40px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${cat.description || 'No description provided.'}</p>
                         <div class="font-weight-bold text-primary mb-3" style="font-size: 0.9rem;">${cat.complaint_count} Complaints</div>
                         <div class="d-flex justify-content-center gap-2">
-                            <button class="btn btn-outline-primary btn-sm py-1 px-2" onclick="editCategoryModal(${cat.id}, '${cat.name}', '${cat.description || ''}', '${cat.icon}', '${cat.color}')" style="font-size: 0.75rem;"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteCategory(${cat.id})" style="font-size: 0.75rem;"><i class="fas fa-trash"></i> Delete</button>
+                            <button class="btn-action" title="Edit" onclick="editCategoryModal(${cat.id}, '${cat.name}', '${cat.description || ''}', '${cat.icon}', '${cat.color}')"><i class="fas fa-edit text-primary"></i></button>
+                            <button class="btn-action delete" title="Delete" onclick="deleteCategory(${cat.id})"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                 </div>

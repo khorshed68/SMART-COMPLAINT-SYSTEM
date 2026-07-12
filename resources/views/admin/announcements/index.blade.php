@@ -3,7 +3,7 @@
 @section('title', 'Announcements Management - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
-<div class="container-fluid fade-in">
+<div class="container-fluid fade-in-up">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 font-weight-bold mb-0">Announcements Management</h1>
     </div>
@@ -16,8 +16,8 @@
         <!-- Schedule Form -->
         <div class="col-xl-4 col-lg-5 mb-4">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="card-title font-weight-bold mb-0" style="color: var(--dark);">Schedule New Announcement</h5>
+                <div class="card-header bg-transparent border-0 py-4">
+                    <h5 class="card-title font-weight-bold mb-0" style="color: var(--dark);"><i class="fas fa-calendar-plus text-primary mr-2"></i> Schedule New Announcement</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.announcements.store') }}" method="POST">
@@ -65,13 +65,13 @@
         <!-- History & Status Table -->
         <div class="col-xl-8 col-lg-7 mb-4">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="card-title font-weight-bold mb-0" style="color: var(--dark);">Announcements Listing</h5>
+                <div class="card-header bg-transparent border-0 py-4">
+                    <h5 class="card-title font-weight-bold mb-0" style="color: var(--dark);"><i class="fas fa-list text-primary mr-2"></i> Announcements Listing</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table align-middle mb-0">
-                            <thead class="table-light">
+                        <table class="table">
+                            <thead>
                                 <tr>
                                     <th>Title</th>
                                     <th>Affected Category</th>
@@ -120,21 +120,26 @@
                                                     $now = now();
                                                 @endphp
                                                 @if($ann->start_time > $now)
-                                                    <span class="badge bg-warning text-dark">Scheduled</span>
+                                                    <span class="badge badge-pending">Scheduled</span>
                                                 @elseif($ann->end_time < $now)
-                                                    <span class="badge bg-light text-muted">Ended</span>
+                                                    <span class="badge badge-inactive">Ended</span>
                                                 @else
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge badge-active">Active</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                {{ $ann->creator->name ?? 'System' }}
+                                                <div class="d-flex align-items-center">
+                                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 8px; font-size: 0.75rem;">
+                                                        {{ substr($ann->creator->name ?? 'S', 0, 1) }}
+                                                    </div>
+                                                    <span class="font-weight-bold">{{ $ann->creator->name ?? 'System' }}</span>
+                                                </div>
                                             </td>
                                             <td class="text-center">
                                                 <form action="{{ route('admin.announcements.destroy', $ann->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this announcement?')" style="display: inline-block;">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm border-0" style="padding: 4px 8px;">
+                                                    <button type="submit" class="btn-action delete" title="Delete">
                                                         <i class="far fa-trash-alt"></i>
                                                     </button>
                                                 </form>

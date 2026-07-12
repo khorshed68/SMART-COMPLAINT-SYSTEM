@@ -3,17 +3,17 @@
 @section('title', 'Manage Users - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
-<div class="fade-in">
+<div class="fade-in-up">
     <div class="dashboard-section-header mb-4">
-        <h1 class="dashboard-section-title"><i class="fas fa-users"></i> Users Management</h1>
+        <h1 class="dashboard-section-title"><i class="fas fa-users text-primary mr-2"></i> Users Management</h1>
     </div>
 
     <!-- Filters Row -->
-    <div class="card mb-4">
+    <div class="card mb-4 border-0 shadow-sm rounded-4">
         <div class="card-body p-3">
             <form id="users-filters-form" onsubmit="event.preventDefault(); applyUserFilters();" class="row align-items-center">
                 <div class="col-md-4" style="padding: 5px 10px;">
-                    <select id="filter-user-status" class="form-select" onchange="applyUserFilters()">
+                    <select id="filter-user-status" class="form-select border-0 bg-light" onchange="applyUserFilters()">
                         <option value="">All Statuses</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
@@ -22,7 +22,7 @@
                 </div>
                 <div class="col-md-8" style="padding: 5px 10px;">
                     <div style="position: relative;">
-                        <input type="text" id="filter-user-search" class="form-control" placeholder="Search by name or email..." style="padding-right: 40px;" onkeyup="debounce(applyUserFilters, 400)()">
+                        <input type="text" id="filter-user-search" class="form-control border-0 bg-light" placeholder="Search by name or email..." style="padding-right: 40px;" onkeyup="debounce(applyUserFilters, 400)()">
                         <i class="fas fa-search text-muted" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);"></i>
                     </div>
                 </div>
@@ -31,10 +31,10 @@
     </div>
 
     <!-- Table -->
-    <div class="card">
+    <div class="card border-0 shadow-none bg-transparent">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-striped">
+                <table class="table">
                     <thead>
                         <tr>
                             <th>ID</th>

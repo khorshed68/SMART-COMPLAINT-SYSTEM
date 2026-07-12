@@ -3,10 +3,10 @@
 @section('title', 'System Settings - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
-<div class="fade-in" style="max-width: 800px; margin: 0 auto;">
-    <h1 class="dashboard-section-title mb-4"><i class="fas fa-sliders-h"></i> System Settings</h1>
+<div class="fade-in-up" style="max-width: 800px; margin: 0 auto;">
+    <h1 class="dashboard-section-title mb-4"><i class="fas fa-sliders-h text-primary mr-2"></i> System Settings</h1>
 
-    <div class="card">
+    <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body">
             <form id="admin-settings-form" onsubmit="saveSettings(event)">
                 <!-- General Settings -->
@@ -66,7 +66,7 @@
                 </div>
 
                 <div class="d-flex justify-content-end mt-4">
-                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                    <button type="submit" class="btn btn-primary font-weight-bold" style="border-radius: 8px; padding: 10px 25px;"><i class="fas fa-save mr-2"></i> Save Settings</button>
                 </div>
             </form>
         </div>

@@ -211,22 +211,22 @@ class FileUploadComponent {
 // Badges generators
 class BadgeHelper {
     static getStatus(status) {
-        let color = '#95a5a6';
-        if (status === 'Pending') color = '#f39c12';
-        if (status === 'In Progress') color = '#3498db';
-        if (status === 'Resolved') color = '#2ecc71';
-        if (status === 'Rejected') color = '#e74c3c';
+        let badgeClass = 'badge-inactive';
+        if (status === 'Pending') badgeClass = 'badge-pending';
+        if (status === 'In Progress') badgeClass = 'badge-progress';
+        if (status === 'Resolved') badgeClass = 'badge-resolved';
+        if (status === 'Rejected') badgeClass = 'badge-rejected';
 
-        return `<span class="badge" style="background-color: ${color}">${status}</span>`;
+        return `<span class="badge ${badgeClass}">${status}</span>`;
     }
 
     static getPriority(priority) {
-        let color = '#95a5a6';
-        if (priority === 'High') color = '#e74c3c';
-        if (priority === 'Medium') color = '#f39c12';
-        if (priority === 'Low') color = '#2ecc71';
+        let badgeClass = 'badge-inactive';
+        if (priority === 'High') badgeClass = 'badge-rejected'; // Red
+        if (priority === 'Medium') badgeClass = 'badge-pending'; // Orange
+        if (priority === 'Low') badgeClass = 'badge-resolved'; // Green
 
-        return `<span class="badge" style="background-color: ${color}">${priority}</span>`;
+        return `<span class="badge ${badgeClass}">${priority}</span>`;
     }
 }
 
