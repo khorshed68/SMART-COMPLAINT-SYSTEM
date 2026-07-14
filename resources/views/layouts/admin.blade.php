@@ -56,6 +56,43 @@
             $('#sidebar-toggle-btn').click(function() {
                 $('.admin-sidebar').toggleClass('active');
             });
+
+            // Mouse tracking background glow and water wave ripples for admin panel
+            const adminMain = document.querySelector('.admin-main');
+            if (adminMain) {
+                let lastX = 0;
+                let lastY = 0;
+
+                adminMain.addEventListener('mousemove', e => {
+                    const rect = adminMain.getBoundingClientRect();
+                    const posX = e.clientX - rect.left;
+                    const posY = e.clientY - rect.top;
+                    
+                    const x = (posX / rect.width) * 100;
+                    const y = (posY / rect.height) * 100;
+                    adminMain.style.setProperty('--mouse-x', `${x}%`);
+                    adminMain.style.setProperty('--mouse-y', `${y}%`);
+
+                    // Check distance threshold to spawn water wave ripple
+                    const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+                    if (dist > 35) {
+                        lastX = e.clientX;
+                        lastY = e.clientY;
+
+                        const ripple = document.createElement('div');
+                        ripple.className = 'bg-ripple';
+                        ripple.style.left = `${posX}px`;
+                        ripple.style.top = `${posY}px`;
+
+                        adminMain.appendChild(ripple);
+
+                        // Remove element after transition completes
+                        setTimeout(() => {
+                            ripple.remove();
+                        }, 800);
+                    }
+                });
+            }
         });
     </script>
     @yield('scripts')

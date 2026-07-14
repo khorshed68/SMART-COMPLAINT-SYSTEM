@@ -137,6 +137,15 @@ h1, h2, h3, h4, h5, h6, .brand-text, .stat-val {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    position: relative;
+    overflow-x: hidden;
+    background-color: var(--light);
+    background-image: 
+        linear-gradient(rgba(112, 94, 207, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(112, 94, 207, 0.015) 1px, transparent 1px),
+        radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(112, 94, 207, 0.04) 0%, transparent 60%);
+    background-size: 45px 45px, 45px 45px, 100% 100%;
+    transition: background-image 0.1s ease;
 }
 
 /* Glassmorphism Topbar */
@@ -404,7 +413,14 @@ body.dark-mode {
     color: #f1f5f9;
 }
 body.dark-mode .admin-topbar { background: rgba(15, 23, 42, 0.85) !important; border-color: var(--border-dark) !important; }
-body.dark-mode .admin-main { background-color: #020617; }
+body.dark-mode .admin-main { 
+    background-color: #020617; 
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(112, 94, 207, 0.14) 0%, transparent 60%);
+    background-size: 45px 45px, 45px 45px, 100% 100%;
+}
 body.dark-mode .stat-card, body.dark-mode .chart-container, body.dark-mode .card, body.dark-mode .tool-card {
     background-color: #0f172a !important; border-color: var(--border-dark) !important;
 }

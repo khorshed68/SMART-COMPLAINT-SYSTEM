@@ -136,8 +136,10 @@ function submitRegister(event) {
 
     submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating account...');
 
+    const url = $(form).attr('action') || '/register';
+
     $.ajax({
-        url: '/register',
+        url: url,
         method: 'POST',
         data: formData,
         processData: false,

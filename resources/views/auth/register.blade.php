@@ -33,7 +33,7 @@
                 Already have an account? <a href="{{ route('login') }}" style="color: #705ecf; text-decoration: none; font-weight: 600;">Log in</a>
             </p>
 
-            <form onsubmit="submitRegister(event)" autocomplete="off" enctype="multipart/form-data">
+            <form action="/register" onsubmit="submitRegister(event)" autocomplete="off" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-6" style="padding: 0 8px;">
                         <div class="form-group">
