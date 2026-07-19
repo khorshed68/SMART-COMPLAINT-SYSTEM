@@ -15,16 +15,45 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="{{ asset('css/bootstrap-custom.css') }}">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    @auth
+        <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    @endauth
     @yield('styles')
 </head>
 <body>
     @auth
-        @include('components.navbar')
-    @endauth
+        <div class="admin-wrapper">
+            <!-- Sidebar -->
+            @if(Auth::user()->role === 'admin')
+                @include('components.admin-sidebar')
+            @elseif(Auth::user()->role === 'staff')
+                @include('components.staff-sidebar')
+            @else
+                @include('components.student-sidebar')
+            @endif
 
-    <main class="@auth main-content @endauth">
-        @yield('content')
-    </main>
+            <!-- Main Workspace -->
+            <div class="admin-main">
+                <!-- Top Navigation -->
+                @if(Auth::user()->role === 'admin')
+                    @include('components.admin-navbar')
+                @elseif(Auth::user()->role === 'staff')
+                    @include('components.staff-navbar')
+                @else
+                    @include('components.student-navbar')
+                @endif
+
+                <!-- View Content -->
+                <div class="p-4" style="flex-grow: 1;">
+                    @yield('content')
+                </div>
+            </div>
+        </div>
+    @else
+        <main>
+            @yield('content')
+        </main>
+    @endauth
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -41,6 +70,11 @@
                 
                 // Initialize theme toggle
                 new ThemeToggle('dark-mode-toggle-btn');
+
+                // Sidebar Mobile Toggle
+                $('#sidebar-toggle-btn').click(function() {
+                    $('.admin-sidebar').toggleClass('active');
+                });
             @endauth
 
             // Mouse tracking background glow and water wave ripples for auth pages
@@ -71,6 +105,80 @@
                         ripple.style.top = `${posY}px`;
 
                         authContainer.appendChild(ripple);
+
+                        // Remove element after transition completes
+                        setTimeout(() => {
+                            ripple.remove();
+                        }, 800);
+                    }
+                });
+            }
+
+            // Mouse tracking background glow and water wave ripples for student panel (admin-main)
+            const adminMain = document.querySelector('.admin-main');
+            if (adminMain) {
+                let lastX = 0;
+                let lastY = 0;
+
+                adminMain.addEventListener('mousemove', e => {
+                    const rect = adminMain.getBoundingClientRect();
+                    const posX = e.clientX - rect.left;
+                    const posY = e.clientY - rect.top;
+                    
+                    const x = (posX / rect.width) * 100;
+                    const y = (posY / rect.height) * 100;
+                    adminMain.style.setProperty('--mouse-x', `${x}%`);
+                    adminMain.style.setProperty('--mouse-y', `${y}%`);
+
+                    // Check distance threshold to spawn water wave ripple
+                    const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+                    if (dist > 35) {
+                        lastX = e.clientX;
+                        lastY = e.clientY;
+
+                        const ripple = document.createElement('div');
+                        ripple.className = 'bg-ripple';
+                        ripple.style.left = `${posX}px`;
+                        ripple.style.top = `${posY}px`;
+
+                        adminMain.appendChild(ripple);
+
+                        // Remove element after transition completes
+                        setTimeout(() => {
+                            ripple.remove();
+                        }, 800);
+                    }
+                });
+            }
+
+            // Mouse tracking background glow and water wave ripples for student sidebar (admin-sidebar)
+            const adminSidebar = document.querySelector('.admin-sidebar');
+            if (adminSidebar) {
+                let lastX = 0;
+                let lastY = 0;
+
+                adminSidebar.addEventListener('mousemove', e => {
+                    const rect = adminSidebar.getBoundingClientRect();
+                    const posX = e.clientX - rect.left;
+                    const posY = e.clientY - rect.top;
+                    
+                    const x = (posX / rect.width) * 100;
+                    const y = (posY / rect.height) * 100;
+                    adminSidebar.style.setProperty('--mouse-x', `${x}%`);
+                    adminSidebar.style.setProperty('--mouse-y', `${y}%`);
+
+                    // Check distance threshold to spawn water wave ripple
+                    const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+                    if (dist > 35) {
+                        lastX = e.clientX;
+                        lastY = e.clientY;
+
+                        const ripple = document.createElement('div');
+                        ripple.className = 'bg-ripple';
+                        ripple.style.left = `${posX}px`;
+                        ripple.style.top = `${posY}px`;
+
+                        adminSidebar.appendChild(ripple);
 
                         // Remove element after transition completes
                         setTimeout(() => {

@@ -93,6 +93,43 @@
                     }
                 });
             }
+
+            // Mouse tracking background glow and water wave ripples for admin sidebar (admin-sidebar)
+            const adminSidebar = document.querySelector('.admin-sidebar');
+            if (adminSidebar) {
+                let lastX = 0;
+                let lastY = 0;
+
+                adminSidebar.addEventListener('mousemove', e => {
+                    const rect = adminSidebar.getBoundingClientRect();
+                    const posX = e.clientX - rect.left;
+                    const posY = e.clientY - rect.top;
+                    
+                    const x = (posX / rect.width) * 100;
+                    const y = (posY / rect.height) * 100;
+                    adminSidebar.style.setProperty('--mouse-x', `${x}%`);
+                    adminSidebar.style.setProperty('--mouse-y', `${y}%`);
+
+                    // Check distance threshold to spawn water wave ripple
+                    const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+                    if (dist > 35) {
+                        lastX = e.clientX;
+                        lastY = e.clientY;
+
+                        const ripple = document.createElement('div');
+                        ripple.className = 'bg-ripple';
+                        ripple.style.left = `${posX}px`;
+                        ripple.style.top = `${posY}px`;
+
+                        adminSidebar.appendChild(ripple);
+
+                        // Remove element after transition completes
+                        setTimeout(() => {
+                            ripple.remove();
+                        }, 800);
+                    }
+                });
+            }
         });
     </script>
     @yield('scripts')

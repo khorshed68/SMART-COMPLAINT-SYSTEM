@@ -1,99 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'Staff Dashboard - ' . setting('site_name', 'Smart Complaint System'))
+@section('title', 'Assigned Complaints - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('content')
 <div class="container fade-in">
-    <!-- Welcome Hero Banner -->
-    <div class="welcome-banner" style="position: relative; background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #312e81 100%); overflow: hidden; padding: 40px 30px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); margin-bottom: 30px;">
-        <!-- Glowing background vectors -->
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1;">
-            <svg width="100%" height="100%">
-                <defs>
-                    <radialGradient id="bannerGlow" cx="70%" cy="40%" r="50%">
-                        <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.25" />
-                        <stop offset="100%" stop-color="#4f46e5" stop-opacity="0" />
-                    </radialGradient>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#bannerGlow)" />
-            </svg>
-        </div>
-
-        <div class="welcome-banner-content" style="position: relative; z-index: 2; max-width: 100%;">
-            <h1 class="welcome-title" style="font-size: 2.1rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                Hello, {{ Auth::user()->name }}! 👋
-            </h1>
-            <p class="welcome-subtitle" style="font-size: 1.05rem; opacity: 0.9; line-height: 1.6; margin-bottom: 0; color: #cbd5e1; max-width: 90%;">
-                Welcome to your Staff Workspace. Below are the complaints assigned to you. Update progress and log resolution details in real-time.
-            </p>
-        </div>
-    </div>
-
-    <!-- Stats Grid -->
-    <div class="row mb-4">
-        <!-- Total Assigned -->
-        <div class="col-md-3 col-sm-6 mb-4">
-            <div class="stat-card stat-total" style="background-color: var(--card-bg); border-left: 4px solid #3b82f6;">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="stat-icon-circle bg-blue">
-                        <i class="fas fa-clipboard-list"></i>
-                    </div>
-                    <div>
-                        <div class="stat-val">{{ $stats->total ?? 0 }}</div>
-                        <div class="stat-lbl">Total Assigned</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending -->
-        <div class="col-md-3 col-sm-6 mb-4">
-            <div class="stat-card stat-pending" style="background-color: var(--card-bg); border-left: 4px solid #f59e0b;">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="stat-icon-circle bg-orange">
-                        <i class="fas fa-hourglass-half"></i>
-                    </div>
-                    <div>
-                        <div class="stat-val">{{ $stats->pending ?? 0 }}</div>
-                        <div class="stat-lbl">Pending</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- In Progress -->
-        <div class="col-md-3 col-sm-6 mb-4">
-            <div class="stat-card stat-progress" style="background-color: var(--card-bg); border-left: 4px solid #8b5cf6;">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="stat-icon-circle bg-purple">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <div>
-                        <div class="stat-val">{{ $stats->in_progress ?? 0 }}</div>
-                        <div class="stat-lbl">In Progress</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Resolved -->
-        <div class="col-md-3 col-sm-6 mb-4">
-            <div class="stat-card stat-resolved" style="background-color: var(--card-bg); border-left: 4px solid #10b981;">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="stat-icon-circle bg-green">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div>
-                        <div class="stat-val">{{ $stats->resolved ?? 0 }}</div>
-                        <div class="stat-lbl">Resolved</div>
-                    </div>
-                </div>
-            </div>
+    <!-- Header Card -->
+    <div class="card mb-4 border-0 shadow-sm" style="border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); margin-bottom: 30px;">
+        <div class="card-body p-4 text-white">
+            <h1 class="font-weight-bold mb-1" style="font-size: 1.8rem;"><i class="fas fa-tasks text-warning mr-2"></i> Assigned Complaints</h1>
+            <p class="mb-0 text-muted" style="font-size: 0.95rem; color: #94a3b8 !important;">Review and update complaints assigned to your department in real-time.</p>
         </div>
     </div>
 
     <!-- Filters and Search -->
-    <div id="assigned-list" class="card mb-4">
+    <div class="card mb-4 border-0 shadow-sm" style="border-radius: 16px; margin-bottom: 30px !important;">
         <div class="card-body p-3">
             <form id="filters-form" onsubmit="event.preventDefault(); applyStaffFilters();" class="row align-items-center">
                 <div class="col-md-4" style="padding: 5px 10px;">

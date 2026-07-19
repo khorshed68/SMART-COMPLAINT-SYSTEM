@@ -144,6 +144,7 @@ Route::middleware(['auth', 'active', 'prevent-back-history'])->group(function ()
     // Staff Dashboard & Operations (Staff Middleware Protected)
     Route::middleware('staff')->prefix('staff')->name('staff.')->group(function () {
         Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('dashboard');
+        Route::get('/complaints', [StaffController::class, 'complaintsIndex'])->name('complaints.index');
         Route::get('/complaints/{id}', [StaffController::class, 'show'])->name('complaints.show');
     });
 

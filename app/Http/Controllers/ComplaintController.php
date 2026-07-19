@@ -35,13 +35,58 @@ class ComplaintController extends Controller
                 SUM(CASE WHEN status = 'Resolved' THEN 1 ELSE 0 END) as resolved
             ")->first();
 
+        // 1. Complaints submitted this month
+        $complaintsThisMonth = Complaint::byUser($userId)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        // 2. Complaint Categories stats for Pie Chart
+        $categoryStats = Complaint::byUser($userId)
+            ->join('categories', 'complaints.category_id', '=', 'categories.id')
+            ->selectRaw('categories.name, COUNT(*) as count')
+            ->groupBy('categories.name')
+            ->get();
+
+        // 3. Monthly Complaints stats for Bar/Line Chart (last 6 months)
+        $monthlyStats = Complaint::byUser($userId)
+            ->selectRaw("DATE_FORMAT(created_at, '%b') as month, COUNT(*) as count")
+            ->groupBy('month')
+            ->orderBy('created_at', 'asc')
+            ->limit(6)
+            ->get();
+
+        // 4. Recent Activity Timeline (Status updates & comments from history)
+        $recentActivity = \App\Models\ComplaintUpdate::join('complaints', 'complaint_updates.complaint_id', '=', 'complaints.id')
+            ->where('complaints.user_id', $userId)
+            ->select('complaint_updates.*', 'complaints.title as complaint_title')
+            ->orderBy('complaint_updates.created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        // 5. Average Resolution Days
+        $avgResolutionSeconds = Complaint::byUser($userId)
+            ->where('status', 'Resolved')
+            ->whereNotNull('resolved_at')
+            ->selectRaw('AVG(TIMESTAMPDIFF(SECOND, created_at, resolved_at)) as avg_seconds')
+            ->first()->avg_seconds;
+        $avgResolutionDays = $avgResolutionSeconds ? round($avgResolutionSeconds / 86400, 1) : null;
+
         $recentComplaints = Complaint::byUser($userId)
             ->with('category')
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
 
-        return view('user.dashboard', compact('stats', 'recentComplaints'));
+        return view('user.dashboard', compact(
+            'stats', 
+            'recentComplaints', 
+            'complaintsThisMonth', 
+            'categoryStats', 
+            'monthlyStats', 
+            'recentActivity', 
+            'avgResolutionDays'
+        ));
     }
 
     /**

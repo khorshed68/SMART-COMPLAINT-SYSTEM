@@ -38,6 +38,14 @@ class StaffController extends Controller
     }
 
     /**
+     * Display complaints list page for staff resolver.
+     */
+    public function complaintsIndex()
+    {
+        return view('staff.complaints-index');
+    }
+
+    /**
      * AJAX: Get paginated assigned complaints list with filtering.
      */
     public function getComplaints(Request $request)

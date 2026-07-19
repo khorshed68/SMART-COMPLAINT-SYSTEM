@@ -1,14 +1,52 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard - ' . setting('site_name', 'Smart Complaint System'))
+@section('title', 'Student Dashboard - ' . setting('site_name', 'Smart Complaint System'))
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.0/dist/chart.min.js"></script>
+<style>
+    /* Premium visual enhancements & layout spacing */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 24px;
+        margin-bottom: 20px;
+    }
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: 6px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: var(--primary);
+    }
+    .timeline-item::after {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 18px;
+        bottom: -22px;
+        width: 2px;
+        background-color: var(--border-color, #e2e8f0);
+    }
+    .timeline-item:last-child::after {
+        display: none;
+    }
+</style>
 @endsection
 
 @section('content')
-<div class="container fade-in">
-    <!-- Campus Announcements Outage Banner -->
+<div class="container-fluid fade-in" style="padding: 0 15px;">
+    <!-- Active Announcements Outage Ticker -->
     <div id="dashboard-announcements-container" class="mb-4 d-none">
         <div class="card border-0 shadow-sm" style="border-left: 4px solid var(--warning) !important; background-color: rgba(243, 156, 18, 0.08); border-radius: 8px; overflow: hidden;">
             <div class="card-body py-3 d-flex align-items-center gap-3">
@@ -35,40 +73,45 @@
         </div>
     </div>
 
-    <!-- Welcome Banner -->
-    <div class="welcome-banner" style="position: relative; background: linear-gradient(135deg, #071f78 0%, #0d38ba 60%, #581c87 100%); overflow: hidden; padding: 50px 40px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 15px 35px rgba(13, 56, 186, 0.25);">
-        <!-- Wave & Glow Background Overlays (CSS vector elements) -->
+    <!-- Welcome Hero Card -->
+    <div class="welcome-banner" style="position: relative; background: linear-gradient(135deg, #2563EB 0%, #4F46E5 60%, #7C3AED 100%); overflow: hidden; padding: 40px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 15px 35px rgba(79, 70, 229, 0.25); color: white; display: flex; align-items: center; justify-content: space-between; gap: 30px; margin-bottom: 30px;">
+        <!-- Wave and Glow vector elements -->
         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;">
             <svg width="100%" height="100%" viewBox="0 0 1000 240" preserveAspectRatio="none" fill="none">
-                <!-- Cyan glowing bubble left bottom -->
                 <circle cx="480" cy="220" r="140" fill="#2563eb" opacity="0.3" filter="blur(65px)" />
-                <!-- Purple glowing bubble top right -->
                 <circle cx="850" cy="40" r="160" fill="#8b5cf6" opacity="0.25" filter="blur(75px)" />
-                <!-- Curved waves -->
                 <path d="M 0 240 Q 300 130, 600 215 T 1000 145 L 1000 240 Z" fill="#0d38ba" opacity="0.3" />
                 <path d="M 0 240 Q 400 100, 750 225 T 1000 105 L 1000 240 Z" fill="#2563eb" opacity="0.15" />
-                <!-- Small decorative elements -->
-                <circle cx="680" cy="60" r="4.5" fill="#a855f7" opacity="0.5" />
-                <circle cx="910" cy="100" r="5" fill="#60a5fa" opacity="0.4" />
-                <circle cx="450" cy="120" r="8" fill="#3b82f6" opacity="0.15" />
-                <circle cx="900" cy="140" r="3.5" fill="#ffffff" opacity="0.75" />
             </svg>
         </div>
 
-        <div class="welcome-banner-content" style="position: relative; z-index: 2; max-width: 100%;">
-            <h1 class="welcome-title" style="font-size: 2.25rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">Hello, {{ Auth::user()->name }}! 👋</h1>
-            <p class="welcome-subtitle" style="font-size: 1.05rem; opacity: 0.9; line-height: 1.65; margin-bottom: 25px; color: #ffffff; max-width: 90%;">Welcome to your workspace dashboard. Submit a campus complaint or track your issue resolutions in real-time.</p>
-            <div class="welcome-meta" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 25px;">
-                <span class="welcome-date-badge" style="border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.05); color: #cbd5e1; font-size: 0.8rem; border-radius: 30px; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
+        <div style="flex-grow: 1; z-index: 2; position: relative;">
+            <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 8px;">Hello, {{ Auth::user()->name }}! 👋</h1>
+            <p style="font-size: 1.05rem; opacity: 0.9; margin-bottom: 20px;">Welcome back! You've submitted <strong>{{ $complaintsThisMonth }}</strong> complaints this month.</p>
+            
+            <div class="d-flex flex-wrap gap-2" style="margin-bottom: 25px;">
+                <span style="border: 1px solid rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.08); color: #e2e8f0; font-size: 0.8rem; border-radius: 30px; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
                     <i class="far fa-calendar-alt"></i> {{ now()->format('l, F j, Y') }}
                 </span>
-                <span class="welcome-date-badge" style="border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.05); color: #cbd5e1; font-size: 0.8rem; border-radius: 30px; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="fas fa-shield-alt"></i> Empowering student voices
+                <span style="border: 1px solid rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.08); color: #e2e8f0; font-size: 0.8rem; border-radius: 30px; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-percent"></i> Resolved Rate: {{ $stats->total > 0 ? round(($stats->resolved / $stats->total) * 100) : 0 }}%
                 </span>
             </div>
+            
+            <!-- Monthly Progress bar -->
+            <div style="max-width: 400px; margin-bottom: 20px;">
+                <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.85rem; opacity: 0.95;">
+                    <span>Monthly Resolution Progress</span>
+                    <strong>{{ $stats->total > 0 ? round(($stats->resolved / $stats->total) * 100) : 0 }}%</strong>
+                </div>
+                <div class="progress" style="height: 8px; background: rgba(255, 255, 255, 0.2); border-radius: 10px; overflow: hidden;">
+                    <div class="progress-bar" role="progressbar" style="width: {{ $stats->total > 0 ? ($stats->resolved / $stats->total) * 100 : 0 }}%; background: #10B981; border-radius: 10px;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+
             <div class="d-flex align-items-center flex-wrap gap-3 mt-3">
-                <a href="{{ route('complaints.create') }}" class="btn py-2.5 px-4 font-weight-bold" style="background-color: #2563eb; border: none; border-radius: 20px; color: #fff; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;"><i class="fas fa-plus"></i> File a Complaint</a>
-                <a href="/announcements" class="btn btn-outline-light py-2.5 px-4 font-weight-bold" style="border-radius: 20px; border: 1.5px solid #8b5cf6; background: transparent; color: #ffffff; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;"><i class="fas fa-bullhorn"></i> Bulletins Board</a>
+                <a href="{{ route('complaints.create') }}" class="btn py-2.5 px-4 font-weight-bold" style="background-color: #ffffff; border: none; border-radius: 20px; color: #2563EB; box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;"><i class="fas fa-plus"></i> New Complaint</a>
+                <a href="{{ route('complaints.index') }}" class="btn py-2.5 px-4 font-weight-bold" style="border-radius: 20px; border: 1.5px solid rgba(255, 255, 255, 0.5); background: transparent; color: #ffffff; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;"><i class="fas fa-history"></i> View History</a>
             </div>
         </div>
     </div>
@@ -77,183 +120,234 @@
     <div class="row">
         <!-- Total Filed -->
         <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-            <div class="stat-card stat-total">
+            <div class="stat-card stat-total" style="border-left: 4px solid #2563EB; border-radius: 12px;">
                 <div class="d-flex align-items-center gap-3">
                     <div class="stat-icon-circle bg-blue">
                         <i class="fas fa-folder"></i>
                     </div>
                     <div>
-                        <div id="stat-total" class="stat-val">0</div>
+                        <div id="stat-total" class="stat-val" style="color: #2563EB;">0</div>
                         <div class="stat-lbl">Total Filed</div>
-                        <div class="stat-desc">All complaints you've submitted</div>
+                        <div class="stat-desc">+2 this week</div>
                     </div>
-                </div>
-                <!-- Mini Trendline (SVG) -->
-                <div class="stat-chart">
-                    <svg viewBox="0 0 100 40" class="trendline">
-                        <path d="M 0 30 Q 25 10, 50 25 T 100 15" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" />
-                        <circle cx="100" cy="15" r="3" fill="#3b82f6" />
-                    </svg>
                 </div>
             </div>
         </div>
         
         <!-- Pending -->
         <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-            <div class="stat-card stat-pending">
+            <div class="stat-card stat-pending" style="border-left: 4px solid #F59E0B; border-radius: 12px;">
                 <div class="d-flex align-items-center gap-3">
                     <div class="stat-icon-circle bg-orange">
                         <i class="fas fa-clock"></i>
                     </div>
                     <div>
-                        <div id="stat-pending" class="stat-val">0</div>
+                        <div id="stat-pending" class="stat-val" style="color: #F59E0B;">0</div>
                         <div class="stat-lbl">Pending</div>
-                        <div class="stat-desc">Awaiting review or action</div>
+                        <div class="stat-desc">Awaiting review</div>
                     </div>
-                </div>
-                <!-- Mini Trendline (SVG) -->
-                <div class="stat-chart">
-                    <svg viewBox="0 0 100 40" class="trendline">
-                        <path d="M 0 25 Q 30 15, 60 30 T 100 10" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" />
-                        <circle cx="100" cy="10" r="3" fill="#f59e0b" />
-                    </svg>
                 </div>
             </div>
         </div>
 
         <!-- In Progress -->
         <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-            <div class="stat-card stat-progress">
+            <div class="stat-card stat-progress" style="border-left: 4px solid #7C3AED; border-radius: 12px;">
                 <div class="d-flex align-items-center gap-3">
                     <div class="stat-icon-circle bg-purple">
                         <i class="fas fa-sync-alt fa-spin"></i>
                     </div>
                     <div>
-                        <div id="stat-in_progress" class="stat-val">0</div>
-                        <div class="stat-lbl">In Progress</div>
-                        <div class="stat-desc">Currently being processed</div>
+                        <div id="stat-in_progress" class="stat-val" style="color: #7C3AED;">0</div>
+                        <div class="stat-lbl">Processing</div>
+                        <div class="stat-desc">Active investigation</div>
                     </div>
-                </div>
-                <!-- Mini Trendline (SVG) -->
-                <div class="stat-chart">
-                    <svg viewBox="0 0 100 40" class="trendline">
-                        <path d="M 0 35 Q 25 5, 50 30 T 100 20" fill="none" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" />
-                        <circle cx="100" cy="20" r="3" fill="#8b5cf6" />
-                    </svg>
                 </div>
             </div>
         </div>
 
         <!-- Resolved -->
         <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-            <div class="stat-card stat-resolved">
+            <div class="stat-card stat-resolved" style="border-left: 4px solid #10B981; border-radius: 12px;">
                 <div class="d-flex align-items-center gap-3">
                     <div class="stat-icon-circle bg-green">
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <div>
-                        <div id="stat-resolved" class="stat-val">0</div>
+                        <div id="stat-resolved" class="stat-val" style="color: #10B981;">0</div>
                         <div class="stat-lbl">Resolved</div>
-                        <div class="stat-desc">Successfully resolved issues</div>
+                        <div class="stat-desc">Resolution complete</div>
                     </div>
-                </div>
-                <!-- Mini Trendline (SVG) -->
-                <div class="stat-chart">
-                    <svg viewBox="0 0 100 40" class="trendline">
-                        <path d="M 0 30 Q 30 40, 60 10 T 100 15" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" />
-                        <circle cx="100" cy="15" r="3" fill="#10b981" />
-                    </svg>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Quick actions -->
-    <div class="dashboard-section-header mt-2 mb-3">
-        <h2 class="dashboard-section-title" style="font-size: 1.15rem; font-weight: 700; color: #1e293b;"><i class="fas fa-rocket text-primary mr-1"></i> Quick Actions</h2>
-    </div>
-    <div class="quick-actions-row">
-        <!-- Submit Complaint -->
-        <a href="{{ route('complaints.create') }}" class="quick-action-card-horizontal action-submit">
-            <div class="action-card-left">
-                <div class="action-icon-circle bg-blue">
-                    <i class="fas fa-plus"></i>
+    <!-- Analytics & Details Grid -->
+    <div class="row">
+        <!-- Left: Charts -->
+        <div class="col-lg-7 mb-4">
+            <!-- Line Chart: Trends -->
+            <div class="card" style="border-radius: 16px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.02); overflow: hidden; margin-bottom: 30px !important;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4">
+                    <h5 class="font-weight-bold mb-0" style="color: #1e293b; font-size: 1rem;"><i class="fas fa-chart-line text-primary mr-1"></i> Complaint Trends</h5>
                 </div>
-                <div>
-                    <div class="action-title">Submit Complaint</div>
-                    <div class="action-desc">File a new issue or campus complaint</div>
-                </div>
-            </div>
-            <div class="action-arrow-circle">
-                <i class="fas fa-arrow-right"></i>
-            </div>
-        </a>
-        
-        <!-- Complaint History -->
-        <a href="{{ route('complaints.index') }}" class="quick-action-card-horizontal action-history">
-            <div class="action-card-left">
-                <div class="action-icon-circle bg-purple">
-                    <i class="fas fa-history"></i>
-                </div>
-                <div>
-                    <div class="action-title">Complaint History</div>
-                    <div class="action-desc">Track status and review past feedback</div>
+                <div class="card-body px-4 pb-4">
+                    <div style="height: 250px; position: relative;">
+                        <canvas id="student-trends-chart"></canvas>
+                    </div>
                 </div>
             </div>
-            <div class="action-arrow-circle">
-                <i class="fas fa-arrow-right"></i>
-            </div>
-        </a>
 
-        <!-- Profile Settings -->
-        <a href="{{ route('profile') }}" class="quick-action-card-horizontal action-settings">
-            <div class="action-card-left">
-                <div class="action-icon-circle bg-green">
-                    <i class="fas fa-user-cog"></i>
+            <!-- Categories pie distribution -->
+            <div class="card" style="border-radius: 16px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.02); overflow: hidden; margin-bottom: 30px !important;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4">
+                    <h5 class="font-weight-bold mb-0" style="color: #1e293b; font-size: 1rem;"><i class="fas fa-chart-pie text-primary mr-1"></i> Complaint Categories</h5>
                 </div>
-                <div>
-                    <div class="action-title">Profile Settings</div>
-                    <div class="action-desc">Update contact or credentials info</div>
+                <div class="card-body px-4 pb-4">
+                    <div style="height: 250px; position: relative;">
+                        <canvas id="student-categories-chart"></canvas>
+                    </div>
                 </div>
             </div>
-            <div class="action-arrow-circle">
-                <i class="fas fa-arrow-right"></i>
+        </div>
+
+        <!-- Right: Activity & Profile -->
+        <div class="col-lg-4 offset-lg-1 mb-4">
+            <!-- Student Profile Summary Card -->
+            <div class="card" style="border-radius: 16px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.02); overflow: hidden; background: linear-gradient(to bottom, #f8fafc, #ffffff); margin-bottom: 30px !important;">
+                <div class="card-body p-4 text-center">
+                    <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://www.gravatar.com/avatar/' . md5(strtolower(trim(Auth::user()->email))) . '?d=mp' }}" alt="Avatar" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 12px;">
+                    <h5 class="font-weight-bold mb-1" style="color: #1e293b; font-size: 1.05rem;">{{ Auth::user()->name }}</h5>
+                    <p class="text-primary mb-3" style="font-size: 0.82rem; font-weight: 600; text-transform: uppercase;">{{ Auth::user()->department ?? 'Computer Science' }}</p>
+                    
+                    <div style="text-align: left; font-size: 0.8rem; color: #4a5568; background: #f1f5f9; border-radius: 10px; padding: 15px;">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Phone:</span>
+                            <span class="font-weight-bold">{{ Auth::user()->phone ?? 'N/A' }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Member Since:</span>
+                            <span class="font-weight-bold">{{ Auth::user()->created_at->format('M Y') }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total Filed:</span>
+                            <span class="font-weight-bold">{{ $stats->total }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Total Resolved:</span>
+                            <span class="font-weight-bold" style="color: #10B981;">{{ $stats->resolved }}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </a>
+
+            <!-- Recent Activity Timeline -->
+            <div class="card" style="border-radius: 16px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.02); overflow: hidden; margin-bottom: 30px !important;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4">
+                    <h5 class="font-weight-bold mb-0" style="color: #1e293b; font-size: 1rem;"><i class="fas fa-stream text-primary mr-1"></i> Recent Activity</h5>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    @forelse($recentActivity as $activity)
+                        <div class="timeline-item">
+                            <div style="font-size: 0.82rem; font-weight: 700; color: #1e293b;">
+                                @if($activity->update_type === 'status_change')
+                                    @if($activity->new_status === 'Resolved')
+                                        <span class="text-success"><i class="fas fa-check-circle mr-1"></i> Resolved</span>
+                                    @elseif($activity->new_status === 'Rejected')
+                                        <span class="text-danger"><i class="fas fa-times-circle mr-1"></i> Rejected</span>
+                                    @else
+                                        <span class="text-warning"><i class="fas fa-clock mr-1"></i> Status: {{ $activity->new_status }}</span>
+                                    @endif
+                                @elseif($activity->update_type === 'assignment')
+                                    <span class="text-info"><i class="fas fa-user-tag mr-1"></i> Assigned</span>
+                                @else
+                                    <span class="text-primary"><i class="fas fa-comment-alt mr-1"></i> Comment</span>
+                                @endif
+                                <small class="text-muted float-right" style="font-size: 0.72rem;">{{ $activity->created_at->diffForHumans() }}</small>
+                            </div>
+                            <div class="text-muted mt-1" style="font-size: 0.78rem;">
+                                Complaint: <span class="font-weight-bold">"{{ $activity->complaint_title }}"</span>
+                                @if($activity->comment)
+                                    <p class="mb-0 mt-1" style="font-style: italic; background: #f8fafc; padding: 6px 10px; border-radius: 6px;">"{{ Str::limit($activity->comment, 60) }}"</p>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-muted text-center py-3 mb-0" style="font-size: 0.82rem;">No recent activity logged.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Resolution rates -->
+            <div class="card" style="border-radius: 16px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.02); overflow: hidden; margin-bottom: 30px !important;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4">
+                    <h5 class="font-weight-bold mb-0" style="color: #1e293b; font-size: 1rem;"><i class="fas fa-tachometer-alt text-primary mr-1"></i> Resolution Stats</h5>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div style="font-size: 0.82rem; color: #4a5568;">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Average Resolution Time</span>
+                                <span class="font-weight-bold text-dark">{{ $avgResolutionDays ? $avgResolutionDays . ' Days' : 'N/A' }}</span>
+                            </div>
+                            <div class="progress" style="height: 6px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                                <div class="progress-bar bg-info" style="width: {{ $avgResolutionDays ? min(($avgResolutionDays / 10) * 100, 100) : 0 }}%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Overall Resolution Rate</span>
+                                <span class="font-weight-bold text-dark">{{ $stats->total > 0 ? round(($stats->resolved / $stats->total) * 100) : 0 }}%</span>
+                            </div>
+                            <div class="progress" style="height: 6px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                                <div class="progress-bar bg-success" style="width: {{ $stats->total > 0 ? ($stats->resolved / $stats->total) * 100 : 0 }}%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Active Complaints</span>
+                            <span class="badge bg-primary px-3 py-1.5" style="border-radius: 10px;">{{ $stats->pending + $stats->in_progress }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Recent complaints table -->
+    <!-- Recent Complaints Table -->
     <div class="row">
         <div class="col-12">
-            <div class="card dashboard-table-card">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <span style="font-weight: 700; color: #1e293b;"><i class="fas fa-list-alt text-primary mr-1"></i> Recent Complaints</span>
-                    <a href="{{ route('complaints.index') }}" class="btn btn-outline-primary btn-sm py-1 px-3" style="font-size: 0.8rem; border-radius: 8px;">View All &rarr;</a>
+            <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header bg-white pt-4 px-4 border-0 d-flex justify-content-between align-items-center">
+                    <span style="font-weight: 700; color: #1e293b; font-size: 1rem;"><i class="fas fa-list-alt text-primary mr-1"></i> Recent Complaints</span>
+                    <a href="{{ route('complaints.index') }}" class="btn btn-outline-primary btn-sm py-1.5 px-3" style="font-size: 0.8rem; border-radius: 8px;">View All &rarr;</a>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover" style="margin-bottom: 0;">
                             <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Title</th>
-                                    <th>Category</th>
-                                    <th>Priority</th>
-                                    <th>Status</th>
-                                    <th>Submitted Date</th>
-                                    <th>Action</th>
+                                <tr style="background: #f8fafc;">
+                                    <th style="padding: 15px 20px;">ID</th>
+                                    <th style="padding: 15px 20px;">Title</th>
+                                    <th style="padding: 15px 20px;">Category</th>
+                                    <th style="padding: 15px 20px;">Priority</th>
+                                    <th style="padding: 15px 20px;">Status</th>
+                                    <th style="padding: 15px 20px;">Submitted Date</th>
+                                    <th style="padding: 15px 20px;">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($recentComplaints as $complaint)
                                     <tr>
-                                        <td><span class="font-weight-bold">#{{ $complaint->id }}</span></td>
-                                        <td>{{ $complaint->title }}</td>
-                                        <td>{{ $complaint->category->name ?? 'Other' }}</td>
-                                        <td><x-priority-badge :priority="$complaint->priority" /></td>
-                                        <td><x-status-badge :status="$complaint->status" /></td>
-                                        <td>{{ $complaint->created_at->format('Y-m-d H:i') }}</td>
-                                        <td>
+                                        <td style="padding: 15px 20px;"><span class="font-weight-bold">#{{ $complaint->id }}</span></td>
+                                        <td style="padding: 15px 20px;">{{ $complaint->title }}</td>
+                                        <td style="padding: 15px 20px;">{{ $complaint->category->name ?? 'Other' }}</td>
+                                        <td style="padding: 15px 20px;"><x-priority-badge :priority="$complaint->priority" /></td>
+                                        <td style="padding: 15px 20px;"><x-status-badge :status="$complaint->status" /></td>
+                                        <td style="padding: 15px 20px;">{{ $complaint->created_at->format('Y-m-d H:i') }}</td>
+                                        <td style="padding: 15px 20px;">
                                             <a href="{{ route('complaints.show', $complaint->id) }}" class="btn btn-outline-primary btn-sm py-1 px-3" style="font-size: 0.75rem; border-radius: 6px;">Details</a>
                                         </td>
                                     </tr>
@@ -261,26 +355,10 @@
                                     <tr>
                                         <td colspan="7" class="text-center p-5">
                                             <div class="d-flex flex-column align-items-center justify-content-center">
-                                                <!-- Empty State Vector (SVG) -->
-                                                <svg viewBox="0 0 120 120" width="80" height="80" style="margin-bottom: 16px;">
-                                                    <defs>
-                                                        <linearGradient id="grad-folder" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="0%" stop-color="#93c5fd"/>
-                                                            <stop offset="100%" stop-color="#3b82f6"/>
-                                                        </linearGradient>
-                                                    </defs>
-                                                    <path d="M 20 40 L 45 40 L 53 48 L 100 48 L 100 90 L 20 90 Z" fill="url(#grad-folder)" opacity="0.3" />
-                                                    <rect x="35" y="25" width="50" height="60" rx="4" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5" transform="rotate(-5, 60, 55)" />
-                                                    <line x1="45" y1="40" x2="75" y2="40" stroke="#cbd5e1" stroke-width="2" />
-                                                    <line x1="45" y1="50" x2="70" y2="50" stroke="#cbd5e1" stroke-width="2" />
-                                                    <line x1="45" y1="60" x2="60" y2="60" stroke="#cbd5e1" stroke-width="2" />
-                                                    
-                                                    <path d="M 20 50 L 100 50 L 100 90 L 20 90 Z" fill="url(#grad-folder)" />
-                                                    <circle cx="85" cy="75" r="10" fill="#3b82f6" />
-                                                    <path d="M 81 75 L 84 78 L 89 73" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" />
-                                                </svg>
+                                                <div style="font-size: 3rem; margin-bottom: 12px;">📂</div>
                                                 <h5 class="font-weight-bold mb-1" style="color: #1e293b;">No complaints yet!</h5>
-                                                <p class="text-muted mb-0" style="font-size: 0.82rem;">You haven't submitted any complaints yet.</p>
+                                                <p class="text-muted mb-3" style="font-size: 0.82rem;">Everything looks good! Submit your first report below.</p>
+                                                <a href="{{ route('complaints.create') }}" class="btn btn-primary font-weight-bold px-4 py-2" style="border-radius: 20px; font-size: 0.8rem;">[ File Your First Complaint ]</a>
                                             </div>
                                         </td>
                                     </tr>
@@ -305,6 +383,72 @@
         setInterval(function() {
             loadDashboardStats();
         }, 30000);
+
+        // Render Charts using passed analytics parameters
+        // 1. Complaint Trends Chart
+        const trendCtx = document.getElementById('student-trends-chart').getContext('2d');
+        const months = {!! json_encode($monthlyStats->pluck('month')) !!};
+        const counts = {!! json_encode($monthlyStats->pluck('count')) !!};
+
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: months.length ? months : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Complaints',
+                    data: counts.length ? counts : [0, 0, 0, 0, 0, 0],
+                    borderColor: '#2563EB',
+                    backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.35
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { precision: 0 },
+                        grid: { color: 'rgba(0, 0, 0, 0.03)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // 2. Complaint Categories Chart
+        const catCtx = document.getElementById('student-categories-chart').getContext('2d');
+        const catNames = {!! json_encode($categoryStats->pluck('name')) !!};
+        const catCounts = {!! json_encode($categoryStats->pluck('count')) !!};
+
+        new Chart(catCtx, {
+            type: 'doughnut',
+            data: {
+                labels: catNames.length ? catNames : ['No Data'],
+                datasets: [{
+                    data: catCounts.length ? catCounts : [1],
+                    backgroundColor: [
+                        '#2563EB', '#4F46E5', '#7C3AED', '#10B981', '#F59E0B', '#EF4444'
+                    ],
+                    borderWidth: 1.5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+                },
+                cutout: '65%'
+            }
+        });
 
         // Load active announcements
         let activeAnnouncements = [];

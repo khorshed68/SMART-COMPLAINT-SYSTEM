@@ -138,15 +138,15 @@
 @endsection
 
 @section('content')
-<div class="container fade-in-up" style="max-width: 900px; margin-top: 20px; margin-bottom: 50px;">
+<div class="container-fluid fade-in-up" style="margin-top: 20px; margin-bottom: 50px; padding: 0 15px;">
     <div class="dashboard-section-header mb-4">
         <h1 class="dashboard-section-title mb-0"><i class="fas fa-user-cog text-primary mr-2"></i> Profile Settings</h1>
     </div>
     
     <div class="row">
-        <!-- Avatar card -->
-        <div class="col-md-4 mb-4">
-            <div class="card profile-card text-center h-100">
+        <!-- Column 1: Profile Avatar -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <div class="card profile-card text-center shadow-sm border-0" style="border-radius: 16px;">
                 <div class="card-header profile-card-header">Profile Avatar</div>
                 <div class="card-body profile-card-body d-flex flex-column align-items-center justify-content-center">
                     <div class="profile-avatar-container" onclick="document.getElementById('avatar-input').click();">
@@ -166,10 +166,9 @@
             </div>
         </div>
 
-        <!-- Details card & Password Card -->
-        <div class="col-md-8">
-            <!-- Contact Information -->
-            <div class="card profile-card mb-4">
+        <!-- Column 2: Contact Information -->
+        <div class="col-lg-5 col-md-8 mb-4">
+            <div class="card profile-card shadow-sm border-0" style="border-radius: 16px;">
                 <div class="card-header profile-card-header">Contact Information</div>
                 <div class="card-body profile-card-body">
                     <form id="profile-details-form" onsubmit="updateProfile(event)">
@@ -196,14 +195,16 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-primary btn-save"><i class="fas fa-save mr-2"></i> Save Details</button>
+                            <button type="submit" class="btn btn-primary btn-save w-100"><i class="fas fa-save mr-2"></i> Save Details</button>
                         </div>
                     </form>
                 </div>
             </div>
+        </div>
 
-            <!-- Password Card -->
-            <div class="card profile-card">
+        <!-- Column 3: Security Credentials -->
+        <div class="col-lg-4 col-md-12 mb-4">
+            <div class="card profile-card shadow-sm border-0" style="border-radius: 16px;">
                 <div class="card-header profile-card-header">Security Credentials</div>
                 <div class="card-body profile-card-body">
                     <form id="profile-password-form" onsubmit="changePassword(event)">
@@ -211,26 +212,20 @@
                             <label class="profile-label" for="pass-current">Current Password</label>
                             <input type="password" id="pass-current" name="current_password" class="form-control profile-input" required placeholder="••••••••">
                         </div>
-                        <div class="row">
-                            <div class="col-md-6" style="padding: 0 10px;">
-                                <div class="form-group mb-3">
-                                    <label class="profile-label" for="pass-new">New Password</label>
-                                    <input type="password" id="pass-new" name="new_password" class="form-control profile-input" required placeholder="••••••••" onkeyup="checkPasswordStrength(this.value)">
-                                    <div class="strength-meter">
-                                        <div id="strength-bar" class="strength-bar"></div>
-                                    </div>
-                                    <div id="strength-text" class="strength-text text-muted">Weak</div>
-                                </div>
+                        <div class="form-group mb-3">
+                            <label class="profile-label" for="pass-new">New Password</label>
+                            <input type="password" id="pass-new" name="new_password" class="form-control profile-input" required placeholder="••••••••" onkeyup="checkPasswordStrength(this.value)">
+                            <div class="strength-meter">
+                                <div id="strength-bar" class="strength-bar"></div>
                             </div>
-                            <div class="col-md-6" style="padding: 0 10px;">
-                                <div class="form-group mb-3">
-                                    <label class="profile-label" for="pass-confirm">Confirm New Password</label>
-                                    <input type="password" id="pass-confirm" name="new_password_confirmation" class="form-control profile-input" required placeholder="••••••••">
-                                </div>
-                            </div>
+                            <div id="strength-text" class="strength-text text-muted">Weak</div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="profile-label" for="pass-confirm">Confirm New Password</label>
+                            <input type="password" id="pass-confirm" name="new_password_confirmation" class="form-control profile-input" required placeholder="••••••••">
                         </div>
                         <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-update-password"><i class="fas fa-key mr-2"></i> Update Password</button>
+                            <button type="submit" class="btn btn-update-password w-100"><i class="fas fa-key mr-2"></i> Update Password</button>
                         </div>
                     </form>
                 </div>
