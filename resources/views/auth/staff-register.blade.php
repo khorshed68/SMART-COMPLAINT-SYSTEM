@@ -34,6 +34,7 @@
             </p>
 
             <form action="/staff/register" onsubmit="submitRegister(event)" autocomplete="off" enctype="multipart/form-data">
+                @csrf
                 <div class="row">
                     <div class="col-md-6" style="padding: 0 8px;">
                         <div class="form-group">

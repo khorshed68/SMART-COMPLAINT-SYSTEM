@@ -50,6 +50,7 @@
             @endif
 
             <form action="{{ route('login') }}" onsubmit="submitLogin(event)" autocomplete="off">
+                @csrf
                 <div class="form-group">
                     <label for="login-email">Staff Email Address</label>
                     <input type="email" id="login-email" name="email" class="form-control" placeholder="plumber@complaint.system" required autofocus readonly onfocus="this.removeAttribute('readonly');">

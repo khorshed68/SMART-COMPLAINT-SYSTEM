@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'active' => \App\Http\Middleware\ActiveUserMiddleware::class,
             'staff' => \App\Http\Middleware\StaffMiddleware::class,
+            'prevent-back-history' => \App\Http\Middleware\PreventBackHistoryMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

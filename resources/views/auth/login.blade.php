@@ -50,6 +50,7 @@
             @endif
 
             <form onsubmit="submitLogin(event)" autocomplete="off">
+                @csrf
                 <div class="form-group">
                     <label for="login-email">Email Address</label>
                     <input type="email" id="login-email" name="email" class="form-control" placeholder="name@example.com" required autofocus readonly onfocus="this.removeAttribute('readonly');">

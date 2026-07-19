@@ -25,7 +25,7 @@ class AdminComplaintController extends Controller
      */
     public function dashboard()
     {
-        $admins = User::admins()->active()->get();
+        $admins = User::admins()->whereIn('status', ['active', 'pending'])->get();
         return view('admin.dashboard', compact('admins'));
     }
 
@@ -34,7 +34,7 @@ class AdminComplaintController extends Controller
      */
     public function index()
     {
-        $admins = User::admins()->active()->get();
+        $admins = User::admins()->whereIn('status', ['active', 'pending'])->get();
         return view('admin.complaints', compact('admins'));
     }
 
@@ -44,7 +44,7 @@ class AdminComplaintController extends Controller
     public function show(int $id)
     {
         $complaint = Complaint::with(['user', 'category', 'assignee'])->findOrFail($id);
-        $admins = User::admins()->active()->get();
+        $admins = User::admins()->whereIn('status', ['active', 'pending'])->get();
         return view('admin.complaint-detail', compact('complaint', 'admins'));
     }
 

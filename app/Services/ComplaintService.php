@@ -170,6 +170,21 @@ class ComplaintService
             $complaint->assigned_to = $assignedToId;
             $complaint->save();
 
+            // Auto-activate assignee if they are a pending staff member
+            if ($assignee->status === 'pending' && $assignee->role === 'staff') {
+                $assignee->status = 'active';
+                $assignee->save();
+
+                // Send email notification on account approval
+                try {
+                    if (setting('enable_email_notifications', '1') === '1') {
+                        Mail::to($assignee->email)->send(new \App\Mail\AccountApprovedMail($assignee));
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Failed to send automatic account approval email to {$assignee->email} during assignment: " . $e->getMessage());
+                }
+            }
+
             // Create timeline entry
             ComplaintUpdate::create([
                 'complaint_id' => $complaint->id,

@@ -33,8 +33,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/api/auth/check-email', [AuthController::class, 'checkEmail']);
 });
 
-// Authenticated User & Admin Routes (both require active user status)
-Route::middleware(['auth', 'active'])->group(function () {
+// Authenticated User & Admin Routes (both require active user status and prevent back history caching)
+Route::middleware(['auth', 'active', 'prevent-back-history'])->group(function () {
     
     // Auth & Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

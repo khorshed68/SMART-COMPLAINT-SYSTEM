@@ -95,7 +95,9 @@
                         <select class="form-select" onchange="assignComplaint({{ $complaint->id }}, this.value)">
                             <option value="">Unassigned</option>
                             @foreach($admins as $admin)
-                                <option value="{{ $admin->id }}" {{ $complaint->assigned_to === $admin->id ? 'selected' : '' }}>{{ $admin->name }}</option>
+                                <option value="{{ $admin->id }}" {{ $complaint->assigned_to === $admin->id ? 'selected' : '' }}>
+                                    {{ $admin->name }} {{ $admin->status === 'pending' ? '(Pending)' : '' }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
